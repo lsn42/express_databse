@@ -1,0 +1,153 @@
+<html lang="zh-cn">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Sign in to Dongfeng Express</title>
+
+  <style>
+    #main_container {
+      background: url("static/bg.svg");
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      background-size: contain;
+      margin: 0 auto;
+      width: 100%;
+      height: 100%;
+    }
+
+    #login_container {
+      background-color: #f6f8faf0;
+      border-radius: 6px;
+      border: 1px solid #eaeceff0;
+      margin: 20px auto;
+      padding: 20px;
+      vertical-align: middle;
+      width: 260px;
+      height: 200px;
+    }
+
+    #login_button {
+      background-color: #2ea44fff;
+      /*#66ccffff*/
+      border-color: #1b1f2326;
+      color: #ffffffff;
+      display: block;
+      text-align: center;
+
+      cursor: pointer;
+      border: 1px solid;
+      border-radius: 6px;
+      padding: 5px 16px;
+      width: 100%;
+      transition: .2s cubic-bezier(.3, 0, .5, 1);
+      transition-property: color;
+      margin: 5px 0px;
+    }
+
+    #login_button:hover {
+      background-color: #2c974bff;
+    }
+
+    .button {
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 16;
+      border: 1px solid;
+      border-radius: 6px;
+      padding: 5px 16px;
+    }
+
+    .input_block {
+      padding: 5px 12px;
+      font-size: 14px;
+      line-height: 20px;
+      vertical-align: middle;
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      border-radius: 6px;
+      outline: none;
+      background: #ffffffff;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .text {
+      font-family: "微软雅黑";
+      font-size: 18;
+    }
+
+    .text-left_align {
+      text-align: left;
+    }
+
+    .center {
+      margin: 0 auto;
+      text-align: center;
+    }
+  </style>
+
+</head>
+
+<body class="center">
+
+  <div id="main_container">
+
+    <div id="info_container">
+      <!--信息，放logo和标题-->
+
+      <div><img alt="logo" src="static/logo.png" width=232 height=107></div>
+
+      <div>
+
+        <h1>登录</h1>
+
+      </div>
+
+    </div>
+
+    <div id="login_container">
+      <!--登录框，包含登录表单-->
+
+      <div id="login">
+
+        <form method="post" action="check_user" id="login_form">
+
+          <div class="text text-left_align"><label for="name">用户名</label></div>
+
+          <div><input class="input_block" name="name" type="text" id="name"></div>
+
+          <div class="text text-left_align"><label for="password">密码</label></div>
+
+          <div><input class="input_block" name="password" type="password" id="password"></div>
+
+          <div><input type="submit" value="登录" class="button" id="login_button" /></div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <div id="register_container">
+
+
+    </div>
+
+    <div id="sql" class="center">
+      <!--执行SQL，测试用-->
+
+      <form method="POST" action="execute_sql">
+
+        <div class="text">sql:<input name="sql" type="text"></div>
+        <div><input type="submit" value="提交" class="button" /></div>
+      </form>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>
