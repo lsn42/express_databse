@@ -1,0 +1,17 @@
+{
+  "id": "800000",
+  "createTime": "2020-12-04",
+  "postmanId": "100001",
+  "firstRoute": {
+    "type": 1,
+    "id": "1739",
+    "startTime": "2020-12-05",
+    "endTime": "2020-12-06"
+  },
+  "secondRoute": {
+    "type": 2,
+    "id": "900000",
+    "startTime": "2020-12-05",
+    "endTime": "2020-12-06"
+  }
+}
