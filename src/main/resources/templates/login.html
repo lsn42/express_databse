@@ -1,4 +1,4 @@
-<html lang="zh-cn">
+<html lang="zh-cn" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
   <meta charset="utf-8">
@@ -7,9 +7,7 @@
 
   <style>
     #main_container {
-      background: url("static/bg.svg");
-      background-position: 50% 50%;
-      background-repeat: no-repeat;
+      background: url("../bg.svg") no-repeat 50% 50%;
       background-size: contain;
       margin: 0 auto;
       width: 100%;
@@ -97,7 +95,7 @@
     <div id="info_container">
       <!--信息，放logo和标题-->
 
-      <div><img alt="logo" src="static/logo.png" width=232 height=107></div>
+      <div><img alt="logo" th:src="@{/logo.png}" width=232 height=107></div>
 
       <div>
 
@@ -112,11 +110,11 @@
 
       <div id="login">
 
-        <form method="post" action="check_user" id="login_form">
+        <form method="post" action="check_user" id="login_form" th:action="@{/login}">
 
-          <div class="text text-left_align"><label for="name">用户名</label></div>
+          <div class="text text-left_align"><label for="username" style="color: red" th:text="${msg}">用户名</label></div>
 
-          <div><input class="input_block" name="name" type="text" id="name"></div>
+          <div><input class="input_block" name="username" type="text" id="username"></div>
 
           <div class="text text-left_align"><label for="password">密码</label></div>
 

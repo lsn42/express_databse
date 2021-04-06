@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 @RestController
 public class ExpressApplication {
 
-	public static HashMap<String, String> USERS = new HashMap<>();
+	public static HashMap<String, String> USERS = new HashMap<String,String>();
 
 	public static final String USERNAME = "root";
 	public static final String PASSWORD = "20001005";
