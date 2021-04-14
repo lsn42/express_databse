@@ -3,7 +3,14 @@ package cn.edu.scau.express;
 public class Express {
   public String id;
   public String createTime;
-  public String postmanId;
+
+  public int postmanId;
+  public int customerId;
+  public int receiverId;
+
+  public String startAddress;
+  public String endAddress;
+
   public Route firstRoute;
   public Route secondRoute;
 

@@ -21,7 +21,7 @@ public class QueryExpressController {
       "jdbc:mysql://localhost:3306/mysql?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Hongkong";
 
   public static final String EXPRESS_SQL =
-      "WITH a AS(select ex_id, customer.express_list.create_time , customer.transport_list.start_time , customer.transport_list.end_time , customer.transport_list.truck_id , customer.transport_list.plane_id ,customer.transport_list.postman_id from customer.express_list inner join customer.transport_list on customer.express_list.trans_id = customer.transport_list.trans_id where customer.transport_list.start_time > customer.express_list.create_time),b AS(SELECT ex_id, customer.express_list.create_time, customer.stored_list.intime, customer.stored_list.outtime, customer.stored_list.stored_id FROM customer.express_list INNER JOIN customer.stored_list ON customer.express_list.store_id = customer.stored_list.stored_id where customer.stored_list.intime > customer.express_list.create_time)SELECT * FROM a NATURAL JOIN b WHERE (b.intime >= a.end_time or b.outtime <= a.start_time) and a.ex_id=";
+      "WITH a AS(select ex_id, customer.express_list.create_time , express_list.customer_id, express_list.receiver_id, customer.transport_list.start_time , customer.transport_list.end_time , customer.transport_list.truck_id , customer.transport_list.plane_id ,customer.transport_list.postman_id, transport_list.start_address, transport_list.end_address from customer.express_list inner join customer.transport_list on customer.express_list.trans_id = customer.transport_list.trans_id where customer.transport_list.start_time > customer.express_list.create_time),b AS(SELECT ex_id, customer.express_list.create_time, customer.stored_list.intime, customer.stored_list.outtime, customer.stored_list.stored_id FROM customer.express_list INNER JOIN customer.stored_list ON customer.express_list.store_id = customer.stored_list.stored_id where customer.stored_list.intime > customer.express_list.create_time) SELECT * FROM a NATURAL JOIN b WHERE (b.intime >= a.end_time or b.outtime <= a.start_time) and a.ex_id=";
 
   @ResponseBody
   @GetMapping(value = "/query/express/{id}")
@@ -36,7 +36,12 @@ public class QueryExpressController {
         Express e = new Express(id);
 
         e.createTime = rs.getString("create_time");
-        e.postmanId = "" + rs.getInt("postman_id");
+        e.postmanId = rs.getInt("postman_id");
+        e.customerId = rs.getInt("customer_id");
+        e.receiverId = rs.getInt("receiver_id");
+
+        e.startAddress = rs.getString("start_address");
+        e.endAddress = rs.getString("end_address");
 
         // first route
         String t = "" + rs.getInt("plane_id");
@@ -46,8 +51,8 @@ public class QueryExpressController {
           e.firstRoute.type = 1;
         }
         e.firstRoute.id = t;
-        e.firstRoute.startTime = rs.getDate("start_time").toString();
-        e.firstRoute.endTime = rs.getDate("end_time").toString();
+        e.firstRoute.startTime = rs.getString("start_time");
+        e.firstRoute.endTime = rs.getString("end_time");
 
         // second route
         e.secondRoute.type = 2;
