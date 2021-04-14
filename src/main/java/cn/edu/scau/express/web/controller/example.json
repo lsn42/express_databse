@@ -1,17 +1,21 @@
 {
-  "id": "800000",
-  "createTime": "2020-12-04",
-  "postmanId": "100001",
+  "id": "800005",
+  "createTime": "2020-12-12",
+  "postmanId": 100029,
+  "customerId": 200039,
+  "receiverId": 300045,
+  "startAddress": "广东省芜湖市B街47号",
+  "endAddress": "广东省芜湖市C街18号",
   "firstRoute": {
-    "type": 1,
-    "id": "1739",
-    "startTime": "2020-12-05",
-    "endTime": "2020-12-06"
+    "type": 0,
+    "id": "700035",
+    "startTime": "2020-12-26",
+    "endTime": "2020-12-27"
   },
   "secondRoute": {
     "type": 2,
-    "id": "900000",
-    "startTime": "2020-12-05",
-    "endTime": "2020-12-06"
+    "id": "900005",
+    "startTime": "2020-12-17",
+    "endTime": "2020-12-18"
   }
 }
