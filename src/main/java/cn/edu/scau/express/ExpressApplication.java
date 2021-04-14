@@ -12,7 +12,7 @@ import java.util.HashMap;
 @RestController
 public class ExpressApplication {
 
-	public static HashMap<String, String> USERS = new HashMap<>();
+	public static HashMap<String, String> USERS = new HashMap<String,String>();
 
 	public static void main(String[] args) {
 		USERS.put("lsn", "lsn20001005");
