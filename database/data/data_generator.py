@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup as bs
+from functools import cmp_to_key
 import json
 import math
 import networkx
@@ -6,6 +7,7 @@ import pymysql
 import random
 import requests
 import time
+import datetime
 
 GAODE = "e8396f296b808b543a7aec70218659d2"
 REGEO = "https://restapi.amap.com/v3/geocode/regeo?key={key}&location={lnt},{lat}"
@@ -46,6 +48,8 @@ TRANSPORT_SQL = "insert into `transport` values({order_id}, {event_id});"
 
 ORDER_TRANSPORT_QUERY = "select * from `order` join `transport` on `order`.id = `transport`.order_id join `transport_event` on `transport`.event_id = `transport_event`.id;"
 PORTER_QUERY = "select * from `porter`;"
+
+ON_TIME_RATE = 0.95
 
 mysql_conn = pymysql.connect(
     host="127.0.0.1", port=3306, user="root", password="20001005", db="test1")
@@ -260,17 +264,113 @@ def transport(tesi):
             if i[0] in empty_order:
                 eo.append(i)
         empty_order = eo
-        print(empty_order)
+
         for o in empty_order:
             sw = near_warehouse(coor(o[2]))
             sp = random.choice(rp)[1]
             dw = near_warehouse(coor(o[3]))
             dp = random.choice(rp)[1]
-            # sql = TRANSPORT_EVENT_SQL.format(
-            #     id=tesi+tec,
-            #     method_id=sp,
-            # )
+            st = o[6]
+            et = o[7]
+            if et < st:
+                continue
+            l = random.randrange(2, 7)
+            pt = sorted(random.sample(
+                range(int(((et-st).seconds)/ON_TIME_RATE)), l*2+1+2))
+            p = networkx.dijkstra_path(WAREHOUSES_GRAPH, source=sw, target=dw)
+            pw = random.sample(p[1:-1], l)
+            pw.append(p[0])
+            pw.append(p[-1])
+            def cmp(x, y): return p.index(x) < p.index(y)
+            for i in range(len(pw)):
+                for j in range(i):
+                    if cmp(pw[i], pw[j]):
+                        t = pw[i]
+                        pw[i] = pw[j]
+                        pw[j] = t
+            print(pw)
+            print(pt)
+
+            sql = TRANSPORT_EVENT_SQL.format(
+                id=tesi+tec,
+                method_id=sp,
+                time=st+datetime.timedelta(seconds=pt[0]),
+                transport_type="in",
+                source=0,
+                destination=sw)
             # cursor.execute(sql)
+            print(sql)
+            sql = TRANSPORT_SQL.format(
+                order_id=o[0],
+                event_id=tesi+tec)
+            tec += 1
+            # cursor.execute(sql)
+            print(sql)
+
+            for i in range(l):
+                sql = TRANSPORT_EVENT_SQL.format(
+                    id=tesi+tec,
+                    method_id=sp,
+                    time=st+datetime.timedelta(seconds=pt[2*i+1]),
+                    transport_type="out",
+                    source=pw[i],
+                    destination=pw[i+1])
+                # cursor.execute(sql)
+                print(sql)
+                sql = TRANSPORT_SQL.format(
+                    order_id=o[0],
+                    event_id=tesi+tec)
+                tec += 1
+                # cursor.execute(sql)
+                print(sql)
+                sql = TRANSPORT_EVENT_SQL.format(
+                    id=tesi+tec,
+                    method_id=sp,
+                    time=st+datetime.timedelta(seconds=pt[2*i+1+1]),
+                    transport_type="in",
+                    source=pw[i],
+                    destination=pw[i+1])
+                # cursor.execute(sql)
+                print(sql)
+                sql = TRANSPORT_SQL.format(
+                    order_id=o[0],
+                    event_id=tesi+tec)
+                tec += 1
+                # cursor.execute(sql)
+                print(sql)
+
+            sql = TRANSPORT_EVENT_SQL.format(
+                id=tesi+tec,
+                method_id=dp,
+                time=st+datetime.timedelta(seconds=pt[-1]),
+                transport_type="out",
+                source=dw,
+                destination=0)
+            # cursor.execute(sql)
+            print(sql)
+            sql = TRANSPORT_SQL.format(
+                order_id=o[0],
+                event_id=tesi+tec)
+            tec += 1
+            # cursor.execute(sql)
+            print(sql)
+            sql = TRANSPORT_EVENT_SQL.format(
+                id=tesi+tec,
+                method_id=dp,
+                time=st+datetime.timedelta(seconds=pt[-2]),
+                transport_type="in",
+                source=dw,
+                destination=0)
+            # cursor.execute(sql)
+            print(sql)
+            sql = TRANSPORT_SQL.format(
+                order_id=o[0],
+                event_id=tesi+tec)
+            tec += 1
+            # cursor.execute(sql)
+            print(sql)
+
+            # mysql_conn.commit()
             break
 
 
@@ -333,10 +433,8 @@ def near_warehouse(loc):
     lnt, lat = loc
     min = WAREHOUSES[0]
     d = distance(lnt, lat, float(WAREHOUSES[0][3]), float(WAREHOUSES[0][4]))
-    print(d)
     for w in WAREHOUSES:
         dd = distance(lnt, lat, float(w[3]), float(w[4]))
-        # print("dd: "+str(dd)+"d: "+str(d))
         if dd < d:
             d = dd
             min = w
@@ -361,7 +459,7 @@ if __name__ == "__main__":
     get_data()
     print(INIT_INFO.format(whc=len(WAREHOUSES), wc=len(WORKERS)))
 
-    transport()
+    transport(8)
 
     # import matplotlib.pyplot as plt
     # plt.figure(figsize=(8, 8))
