@@ -266,19 +266,22 @@ def transport(tesi):
         empty_order = eo
 
         for o in empty_order:
-            sw = near_warehouse(coor(o[2]))
-            sp = random.choice(rp)[1]
-            dw = near_warehouse(coor(o[3]))
-            dp = random.choice(rp)[1]
-            st = o[6]
-            et = o[7]
-            if et < st:
+            sw = near_warehouse(coor(o[2]))  # start warehouse id
+            sp = random.choice(rp)[1]  # start porter id
+            dw = near_warehouse(coor(o[3]))  # destination warehouse id
+            dp = random.choice(rp)[1]  # destination porter id
+            st = o[6]  # start time
+            et = o[7]  # end time
+            if et < st:  # invalid order
                 continue
-            l = random.randrange(2, 7)
+            l = random.randrange(2, 7)  # middle transport
+            pm = random.sample(
+                [i[0] for i in TRANSPORT_METHODS if not i[1].startswith("快递员")], l)  # path method
             pt = sorted(random.sample(
-                range(int(((et-st).seconds)/ON_TIME_RATE)), l*2+1+2))
-            p = networkx.dijkstra_path(WAREHOUSES_GRAPH, source=sw, target=dw)
-            pw = random.sample(p[1:-1], l)
+                range(int(((et-st).seconds)/ON_TIME_RATE)), l*2+1+2))  # path times
+            p = networkx.dijkstra_path(
+                WAREHOUSES_GRAPH, source=sw, target=dw)  # dijiesitela path
+            pw = random.sample(p[1:-1], l)  # path warehouse
             pw.append(p[0])
             pw.append(p[-1])
             def cmp(x, y): return p.index(x) < p.index(y)
@@ -288,9 +291,11 @@ def transport(tesi):
                         t = pw[i]
                         pw[i] = pw[j]
                         pw[j] = t
-            print(pw)
-            print(pt)
+            print([(st+datetime.timedelta(seconds=i)).strftime(TIME_FORMAT)
+                   for i in pt], pm, pw)
 
+            # company recieve package from customer
+            # warehouse 0 means customer
             sql = TRANSPORT_EVENT_SQL.format(
                 id=tesi+tec,
                 method_id=sp,
@@ -298,46 +303,41 @@ def transport(tesi):
                 transport_type="in",
                 source=0,
                 destination=sw)
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
             sql = TRANSPORT_SQL.format(
                 order_id=o[0],
                 event_id=tesi+tec)
             tec += 1
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
 
+            # each middle transport
             for i in range(l):
                 sql = TRANSPORT_EVENT_SQL.format(
                     id=tesi+tec,
-                    method_id=sp,
+                    method_id=pm[i],
                     time=st+datetime.timedelta(seconds=pt[2*i+1]),
                     transport_type="out",
                     source=pw[i],
                     destination=pw[i+1])
-                # cursor.execute(sql)
-                print(sql)
+                cursor.execute(sql)
                 sql = TRANSPORT_SQL.format(
                     order_id=o[0],
                     event_id=tesi+tec)
                 tec += 1
-                # cursor.execute(sql)
-                print(sql)
+                cursor.execute(sql)
                 sql = TRANSPORT_EVENT_SQL.format(
                     id=tesi+tec,
-                    method_id=sp,
+                    method_id=pm[i],
                     time=st+datetime.timedelta(seconds=pt[2*i+1+1]),
                     transport_type="in",
                     source=pw[i],
                     destination=pw[i+1])
-                # cursor.execute(sql)
-                print(sql)
+                cursor.execute(sql)
                 sql = TRANSPORT_SQL.format(
                     order_id=o[0],
                     event_id=tesi+tec)
                 tec += 1
-                # cursor.execute(sql)
-                print(sql)
+                cursor.execute(sql)
 
             sql = TRANSPORT_EVENT_SQL.format(
                 id=tesi+tec,
@@ -346,14 +346,12 @@ def transport(tesi):
                 transport_type="out",
                 source=dw,
                 destination=0)
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
             sql = TRANSPORT_SQL.format(
                 order_id=o[0],
                 event_id=tesi+tec)
             tec += 1
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
             sql = TRANSPORT_EVENT_SQL.format(
                 id=tesi+tec,
                 method_id=dp,
@@ -361,21 +359,19 @@ def transport(tesi):
                 transport_type="in",
                 source=dw,
                 destination=0)
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
             sql = TRANSPORT_SQL.format(
                 order_id=o[0],
                 event_id=tesi+tec)
             tec += 1
-            # cursor.execute(sql)
-            print(sql)
+            cursor.execute(sql)
 
-            # mysql_conn.commit()
+            mysql_conn.commit()
             break
 
 
 def get_data():
-    global WORKERS, WAREHOUSES, TRANSPORT_METHODS, CUSTOMERS, ORDER, WAREHOUSES_GRAPH
+    global WORKERS, WAREHOUSES, TRANSPORT_METHODS, CUSTOMERS, ORDER, TRANSPORT_EVENT, WAREHOUSES_GRAPH
     with mysql_conn.cursor() as cursor:
         sql = "select * from `worker`;"
         cursor.execute(sql)
@@ -392,6 +388,9 @@ def get_data():
         sql = "select * from `order`;"
         cursor.execute(sql)
         ORDER = cursor.fetchall()
+        sql = "select * from `transport_event`;"
+        cursor.execute(sql)
+        TRANSPORT_EVENT = cursor.fetchall()
     try:
         WAREHOUSES_GRAPH = networkx.read_gpickle(WAREHOUSES_GRAPH_PATH)
     except FileNotFoundError:
@@ -452,6 +451,7 @@ TRANSPORT_METHODS = []
 CUSTOMERS = []
 PAY_METHODS = []
 ORDER = []
+TRANSPORT_EVENT = []
 
 WAREHOUSES_GRAPH = None
 
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     get_data()
     print(INIT_INFO.format(whc=len(WAREHOUSES), wc=len(WORKERS)))
 
-    transport(8)
+    transport(last(TRANSPORT_EVENT)+1)
 
     # import matplotlib.pyplot as plt
     # plt.figure(figsize=(8, 8))
