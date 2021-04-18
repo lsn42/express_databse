@@ -291,8 +291,8 @@ def transport(tesi):
                         t = pw[i]
                         pw[i] = pw[j]
                         pw[j] = t
-            print([(st+datetime.timedelta(seconds=i)).strftime(TIME_FORMAT)
-                   for i in pt], pm, pw)
+            # print([(st+datetime.timedelta(seconds=i)).strftime(TIME_FORMAT)
+            #        for i in pt], pm, pw)
 
             # company recieve package from customer
             # warehouse 0 means customer
@@ -342,7 +342,7 @@ def transport(tesi):
             sql = TRANSPORT_EVENT_SQL.format(
                 id=tesi+tec,
                 method_id=dp,
-                time=st+datetime.timedelta(seconds=pt[-1]),
+                time=st+datetime.timedelta(seconds=pt[-2]),
                 transport_type="out",
                 source=dw,
                 destination=0)
@@ -355,7 +355,7 @@ def transport(tesi):
             sql = TRANSPORT_EVENT_SQL.format(
                 id=tesi+tec,
                 method_id=dp,
-                time=st+datetime.timedelta(seconds=pt[-2]),
+                time=st+datetime.timedelta(seconds=pt[-1]),
                 transport_type="in",
                 source=dw,
                 destination=0)
@@ -367,7 +367,6 @@ def transport(tesi):
             cursor.execute(sql)
 
             mysql_conn.commit()
-            break
 
 
 def get_data():
