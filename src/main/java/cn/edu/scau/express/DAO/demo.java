@@ -1,4 +1,4 @@
-package cn.edu.scau.express.DAO;
+package cn.edu.scau.express.dao;
 
 import cn.edu.scau.express.Express;
 

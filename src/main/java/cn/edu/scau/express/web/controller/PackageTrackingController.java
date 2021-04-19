@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import cn.edu.scau.express.DAO.PackageTrackingDAO;
+import cn.edu.scau.express.dao.PackageTrackingDAO;
 import cn.edu.scau.express.bean.PackageTrace;
 
 @RestController
