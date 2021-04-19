@@ -14,7 +14,7 @@ public class PackageTrackingDAO {
   private String jdbcPassWord = "20001005";
 
   public static final String SELECT_PACKAGE_TRACE_BY_ID =
-      "select * from package_tracking where id=?";
+      "select * from package_tracking where id=?;";
 
   protected Connection getConnect() {
     Connection connection = null;
