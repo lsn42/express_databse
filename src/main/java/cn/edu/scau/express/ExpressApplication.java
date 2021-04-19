@@ -1,5 +1,6 @@
 package cn.edu.scau.express;
 
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 
+
 @SpringBootApplication
 @RestController
+//@MapperScan(value = "cn.edu.scau.express")
 public class ExpressApplication {
 
 	public static HashMap<String, String> USERS = new HashMap<String,String>();
