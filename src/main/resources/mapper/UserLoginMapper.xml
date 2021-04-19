@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.scau.express.DAO.UserLoginMapper">
+    <select id="queryAll" resultType="cn.edu.scau.express.pojo.UserLogin">
+        select * from user_group
+    </select>
+
+    <insert id="add" parameterType="cn.edu.scau.express.pojo.UserLogin">
+        insert into user_group values (#{user_id},#{user_name},#{user_psw},"normal")
+    </insert>
+
+    <select id="queryByName" resultType="cn.edu.scau.express.pojo.UserLogin">
+        select * from user_group where user_name = #{user_name}
+    </select>
+
+    <select id="queryById" resultType="cn.edu.scau.express.pojo.UserLogin">
+        select * from user_group where user_id = #{user_id} and user_psw = #{user_psw}
+    </select>
+
+    <select id="queryPswById" resultType="string">
+        select user_psw from user_group where user_id = #{user_id}
+    </select>
+</mapper>
+

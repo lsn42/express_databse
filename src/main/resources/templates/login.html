@@ -112,13 +112,13 @@
 
         <form method="post" action="check_user" id="login_form" th:action="@{/login}">
 
-          <div class="text text-left_align"><label for="username" style="color: red" th:text="${msg}">用户名</label></div>
+          <div class="text text-left_align"><label for="user_id" style="color: red" th:text="${msg}">账号</label></div>
 
-          <div><input class="input_block" name="username" type="text" id="username"></div>
+          <div><input class="input_block" name="user_id" type="text" id="user_id"></div>
 
-          <div class="text text-left_align"><label for="password">密码</label></div>
+          <div class="text text-left_align"><label for="user_psw">密码</label></div>
 
-          <div><input class="input_block" name="password" type="password" id="password"></div>
+          <div><input class="input_block" name="user_psw" type="password" id="user_psw"></div>
 
           <div><input type="submit" value="登录" class="button" id="login_button" /></div>
 
