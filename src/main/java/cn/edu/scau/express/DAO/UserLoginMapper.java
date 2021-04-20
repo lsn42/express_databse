@@ -1,9 +1,8 @@
 package cn.edu.scau.express.dao;
 
-import cn.edu.scau.express.pojo.UserLogin;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
-
+import cn.edu.scau.express.bean.UserLogin;
 import java.util.List;
 
 @Mapper

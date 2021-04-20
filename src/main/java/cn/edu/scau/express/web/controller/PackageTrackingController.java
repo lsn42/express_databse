@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import cn.edu.scau.express.dao.PackageTrackingDAO;
-import cn.edu.scau.express.bean.PackageTrace;
+
+import cn.edu.scau.express.service.PackageTrackingService;
 
 @RestController
 @CrossOrigin
@@ -15,8 +15,6 @@ public class PackageTrackingController {
   @ResponseBody
   @GetMapping(value = "/query/trace/{id}")
   public String Trace(@PathVariable("id") String id) {
-    PackageTrackingDAO ptd = new PackageTrackingDAO();
-    PackageTrace pt = ptd.selectPackageTrace(id);
-    return (new Gson()).toJson(pt);
+    return (new Gson()).toJson(PackageTrackingService.queryById(id));
   }
 }

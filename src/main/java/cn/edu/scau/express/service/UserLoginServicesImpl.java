@@ -1,7 +1,7 @@
 package cn.edu.scau.express.service;
 
+import cn.edu.scau.express.bean.UserLogin;
 import cn.edu.scau.express.dao.UserLoginMapper;
-import cn.edu.scau.express.pojo.UserLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package cn.edu.scau.express.web.controller;
 
-import cn.edu.scau.express.pojo.UserLogin;
+import cn.edu.scau.express.bean.UserLogin;
 import cn.edu.scau.express.service.UserLoginServicesImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

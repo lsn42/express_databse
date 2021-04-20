@@ -1,7 +1,7 @@
 package cn.edu.scau.express;
 
+import cn.edu.scau.express.bean.UserLogin;
 import cn.edu.scau.express.dao.UserLoginMapper;
-import cn.edu.scau.express.pojo.UserLogin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
