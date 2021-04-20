@@ -48,7 +48,7 @@ public class UserLoginController {
 
     @RequestMapping("/RegisterSuccess")
     public String toRegisterSuccess(Model model, UserLogin userLogin) {
-        int add = userLoginServicesImpl.add(userLogin);
+        userLoginServicesImpl.add(userLogin);
         System.out.println("插入成功");
         model.addAttribute("data", "注册成功，请登录！");
         return "login_test";

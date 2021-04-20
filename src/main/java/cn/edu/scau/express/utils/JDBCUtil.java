@@ -9,9 +9,9 @@ import java.sql.SQLException;
 
 public abstract class JDBCUtil {
   // useSSL=false 是Mysql数据库的SSL连接问题，提示警告不建议使用没有带服务器身份验证的SSL连接
-  private static final String DRIVER = "com.mysql.jdbc.Driver";
+  private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
   private static final String URL =
-      "jdbc:mysql://172.16.81.238:3306/finalex?useSSL=false";
+      "jdbc:mysql://172.16.81.238:3306/test1?useSSL=false";
   private static final String USER = "root";
   private static final String PASSWORD = "20001005";
   static {

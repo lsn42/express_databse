@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.edu.scau.express.DAO.UserLoginMapper">
+<mapper namespace="cn.edu.scau.express.dao.UserLoginMapper">
     <select id="queryAll" resultType="cn.edu.scau.express.bean.UserLogin">
         select * from user_group
     </select>
