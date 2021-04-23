@@ -458,7 +458,7 @@ if __name__ == "__main__":
     get_data()
     print(INIT_INFO.format(whc=len(WAREHOUSES), wc=len(WORKERS)))
 
-    transport(last(TRANSPORT_EVENT)+1)
+    # transport(last(TRANSPORT_EVENT)+1)
 
     # import matplotlib.pyplot as plt
     # plt.figure(figsize=(8, 8))
@@ -473,7 +473,7 @@ if __name__ == "__main__":
     # print(d)
 
     # warehouse(last(WAREHOUSES)+1, 500)
-    # worker(last(WORKERS)+1, 900)
+    worker(last(WORKERS)+1, 900)
     # customer(21, 12, 1, 12, 10)
     # get_data()
     # truck(1, 1, 10)
