@@ -14,6 +14,6 @@ public class WorkerController {
   @GetMapping(value = "/query_all/worker")
   public String Trace() {
     WorkerService ws = new WorkerService();
-    return (new Gson()).toJson(ws.selectAll());
+    return (new Gson()).toJson(ws.selectHead(100));
   }
 }

@@ -14,10 +14,30 @@ public class WorkerDAO {
   public ArrayList<Worker> selectAll() {
     ArrayList<Worker> result = new ArrayList<>();
     try (Connection connection = JDBCUtil.getConnection()) {
-      PreparedStatement preparedStatement =
-          connection.prepareStatement(SELECT_ALL);
-      ResultSet rs = preparedStatement.executeQuery();
+      PreparedStatement ps = connection.prepareStatement(SELECT_ALL);
+      ResultSet rs = ps.executeQuery();
       while (rs.next()) {
+        Worker w = new Worker();
+        w.id = rs.getInt("id");
+        w.name = rs.getString("name");
+        w.sex = rs.getString("sex");
+        w.tel = rs.getString("tel");
+        w.address = rs.getString("address");
+        w.salary = rs.getInt("salary");
+        result.add(w);
+      }
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+    return result;
+  }
+
+  public ArrayList<Worker> selectHead(int count) {
+    ArrayList<Worker> result = new ArrayList<>();
+    try (Connection connection = JDBCUtil.getConnection()) {
+      PreparedStatement ps = connection.prepareStatement(SELECT_ALL);
+      ResultSet rs = ps.executeQuery();
+      while (rs.next() && count-- > 0) {
         Worker w = new Worker();
         w.id = rs.getInt("id");
         w.name = rs.getString("name");

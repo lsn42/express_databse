@@ -9,4 +9,9 @@ public class WorkerService {
     WorkerDAO wd = new WorkerDAO();
     return wd.selectAll();
   }
+
+  public ArrayList<Worker> selectHead(int count) {
+    WorkerDAO wd = new WorkerDAO();
+    return wd.selectHead(count);
+  }
 }
