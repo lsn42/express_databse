@@ -1,8 +1,8 @@
 package cn.edu.scau.express.service;
 
 import java.util.Random;
-import cn.edu.scau.express.dao.CustomerDAO;
 import cn.edu.scau.express.dao.OrderDAO;
+import cn.edu.scau.express.dao.customer.CustomerDAO;
 
 public class PlaceOrderService {
   public void insert(String n, String s, String d, String t, double w,

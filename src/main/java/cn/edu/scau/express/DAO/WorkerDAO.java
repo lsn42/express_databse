@@ -9,7 +9,8 @@ import cn.edu.scau.express.utils.JDBCUtil;
 import cn.edu.scau.express.bean.Worker;
 
 public class WorkerDAO {
-  public static final String SELECT_ALL = "select * from worker;";
+  public static final String SELECT_ALL = "select * from `worker`;";
+  public static final String DELETE_BY_ID = "delete from `worker` where id=?;";
 
   public ArrayList<Worker> selectAll() {
     ArrayList<Worker> result = new ArrayList<>();
@@ -51,5 +52,17 @@ public class WorkerDAO {
       ex.printStackTrace();
     }
     return result;
+  }
+
+  public boolean delete(int id) {
+    try (Connection connection = JDBCUtil.getConnection()) {
+      PreparedStatement ps = connection.prepareStatement(DELETE_BY_ID);
+      ps.setInt(1, id);
+      ps.executeUpdate();
+      return true;
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+      return false;
+    }
   }
 }

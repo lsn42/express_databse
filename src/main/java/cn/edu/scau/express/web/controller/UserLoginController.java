@@ -41,17 +41,17 @@ public class UserLoginController {
             String psw =
                     userLoginServicesImpl.queryPswById(userLogin1.getUser_id());
 
-            if(userLogin1.getUser_permission().equals("admin")){
-                log.info("userID: " + userLogin1.getUser_id() + " permission: " + userLogin1.getUser_permission() + " is logging");
+            System.out.println(userLogin1.getUser_psw());
+            System.out.println(psw);
+            if (userLogin1.getUser_permission().equals("admin")) {
+
                 return "admin";
-            }
-            else if (userLogin1.getUser_permission().equals("normal")){
-                log.info("userID: " + userLogin1.getUser_id() + " permission: " + userLogin1.getUser_permission() + " is logging");
+            } else if (userLogin1.getUser_permission().equals("normal")) {
                 return "normal";
             }
-        }
-        else{
-            log.info("userID: " + userLogin1.getUser_id() + " is logging failure");
+
+        } else {
+
             model.addAttribute("data", "该用户不存在，或密码错误");
 
         }
@@ -64,17 +64,18 @@ public class UserLoginController {
     }
 
     @PostMapping("/RegisterSuccess")
-    public String toRegisterSuccess(Model model, UserLogin userLogin) throws SQLIntegrityConstraintViolationException {
-        try{
+    public String toRegisterSuccess(Model model, UserLogin userLogin)
+            throws SQLIntegrityConstraintViolationException {
+        try {
             userLoginServicesImpl.add(userLogin);
             System.out.println("插入成功");
             model.addAttribute("data", "注册成功，请登录！");
             return "true";
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("data","已有该用户存在");
+            model.addAttribute("data", "已有该用户存在");
         }
-            return "false";
+        return "false";
     }
 
 }
