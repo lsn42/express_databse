@@ -66,7 +66,7 @@ create table `customer`(
 ) engine = innodb character set = utf8mb4;
 -- empty customer
 insert into `customer`
-values(0, 'null', 'null', 'undefined', 'undefined');
+values(0, null, null, null, null);
 drop table if exists `pay_method`;
 create table `pay_method`(
   `id` int primary key not null,
