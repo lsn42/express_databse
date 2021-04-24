@@ -1,4 +1,4 @@
-package cn.edu.scau.express.dao;
+package cn.edu.scau.express.dao.customer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

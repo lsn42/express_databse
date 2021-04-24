@@ -1,25 +1,24 @@
 package cn.edu.scau.express.service;
 
 import java.util.ArrayList;
-import cn.edu.scau.express.bean.CustomerBill;
-import cn.edu.scau.express.dao.CustomerBillMapper;
+import cn.edu.scau.express.dao.customer.BillDAO;
+import cn.edu.scau.express.bean.customer.bill.item.*;
 
 public class CustomerBillService {
-    public static CustomerBill FindBill(String id) {
 
-        CustomerBillMapper customerBillMapper = new CustomerBillMapper();
-        CustomerBill cb = customerBillMapper.selectCustomerBill(id);
-        return cb;
-    }
+  public ArrayList<Simple> selectSimple() {
+    BillDAO bd = new BillDAO();
+    return bd.selectSimple();
+  }
 
-    // time ?
-    public static ArrayList<CustomerBill> FindListsBill(String id) {
+  public ArrayList<Type> selectType() {
+    BillDAO bd = new BillDAO();
+    return bd.selectType();
+  }
 
-        ArrayList<CustomerBill> lists = new ArrayList<>();
-        CustomerBillMapper customerBillMapper = new CustomerBillMapper();
-
-        lists = customerBillMapper.selectCustomerBillLists(id);
-        return lists;
-    }
+  public ArrayList<Each> selectEach() {
+    BillDAO bd = new BillDAO();
+    return bd.selectEach();
+  }
 
 }

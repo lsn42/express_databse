@@ -1,27 +1,34 @@
 package cn.edu.scau.express.web.controller;
 
 import com.google.gson.Gson;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.RestController;
 import cn.edu.scau.express.service.CustomerBillService;
 
+@RestController
+@CrossOrigin
 public class CustomerBillController {
 
-    @ResponseBody
-    @GetMapping(value = "/query/bill/personal/{id}/")
-    public String ChargeBill(@PathVariable("id") String id) {
-        //
-        return (new Gson()).toJson(CustomerBillService.FindBill(id));
-    }
+  @ResponseBody
+  @GetMapping(value = "/query_all/bill/simple")
+  public String simple() {
+    CustomerBillService cbs = new CustomerBillService();
+    return (new Gson()).toJson(cbs.selectSimple());
+  }
 
-    // Serach Type? By Time?
-    @ResponseBody
-    @GetMapping(value = "/query/bill/search/{id}/")
-    public String IndivialBill(@PathVariable("id") String id) {
-        //
-        return (new Gson()).toJson(CustomerBillService.FindListsBill(id));
-    }
+  @ResponseBody
+  @GetMapping(value = "/query_all/bill/type")
+  public String type() {
+    CustomerBillService cbs = new CustomerBillService();
+    return (new Gson()).toJson(cbs.selectType());
+  }
+
+  @ResponseBody
+  @GetMapping(value = "/query_all/bill/each")
+  public String each() {
+    CustomerBillService cbs = new CustomerBillService();
+    return (new Gson()).toJson(cbs.selectEach());
+  }
 }
