@@ -1,5 +1,16 @@
 SET FOREIGN_KEY_CHECKS = 0;
 -- -------------------------------------------------------------------------- --
+drop table if exists `user_group`;
+CREATE TABLE `user_group` (
+  `user_id` varchar(64) not null,
+  `user_name` varchar(64) default null,
+  `user_psw` varchar(64) default null,
+  `user_permission` char(16) default null,
+  primary key (`user_id`)
+) engine = innodb character set = utf8mb4;
+insert into `user_group`
+values('admin', 'administrator', 'admin', 'admin');
+-- -------------------------------------------------------------------------- --
 drop table if exists `warehouse`;
 create table `warehouse`(
   `id` int primary key not null,
@@ -9,6 +20,8 @@ create table `warehouse`(
   `latitude` decimal(10, 6),
   `volume` decimal(32, 3) comment 'cubemeter'
 ) engine = innodb character set = utf8mb4;
+insert into `warehouse`
+values(0, null, null, null, null, null);
 -- -------------------------------------------------------------------------- --
 drop table if exists `worker`;
 create table `worker`(
@@ -19,6 +32,8 @@ create table `worker`(
   `address` varchar(256),
   `salary` decimal(10, 2)
 ) engine = innodb character set = utf8mb4;
+insert into `worker`
+values(0, null, null, null, null, null);
 -- -------------------------------------------------------------------------- --
 drop table if exists `transport_method`;
 create table `transport_method`(
@@ -142,8 +157,7 @@ create table `transport`(
 -- -------------------------------------------------------------------------- --
 drop view if exists `package_tracking`;
 create view `package_tracking` as
-select
-  `order`.`id`,
+select `order`.`id`,
   `warehouse_s`.`name` as `source_name`,
   `warehouse_s`.`longitude` as `source_longitude`,
   `warehouse_s`.`latitude` as `source_latitude`,
@@ -158,14 +172,13 @@ from `order`
   join `transport_event` on `transport`.`event_id` = `transport_event`.`id`
   join `warehouse` as `warehouse_s` on `transport_event`.`source` = `warehouse_s`.`id`
   join `warehouse` as `warehouse_d` on `transport_event`.`destination` = `warehouse_d`.`id`
-  join `transport_method` on `transport_event`.`method_id`=`transport_method`.`id`
+  join `transport_method` on `transport_event`.`method_id` = `transport_method`.`id`
 order by `transport_event`.`time` desc;
 drop view if exists `truck_tracking`;
 create view `truck_tracking` as
-select 
-  `truck`.`id`,
+select `truck`.`id`,
   `transport_event`.`time`,
-  `transport_event`.`type`as `transport_type`,
+  `transport_event`.`type` as `transport_type`,
   `truck`.`type`,
   `truck`.`plate`,
   `warehouse_s`.`name` as `source_name`,
@@ -177,11 +190,12 @@ select
   `warehouse_d`.`latitude` as `destination_latitude`
 from `transport_event`
   join `transport_method` on `transport_event`.`method_id` = `transport_method`.`id`
-  join `truck` on `truck`.`method_id`= `transport_method`.`id`
-  join `worker` on `truck`.`worker_id`= `worker`.`id`
+  join `truck` on `truck`.`method_id` = `transport_method`.`id`
+  join `worker` on `truck`.`worker_id` = `worker`.`id`
   join `warehouse` as `warehouse_s` on `transport_event`.`source` = `warehouse_s`.`id`
   join `warehouse` as `warehouse_d` on `transport_event`.`destination` = `warehouse_d`.`id`
-order by `transport_event`.`time` desc;drop view if exists `simple_bill`;
+order by `transport_event`.`time` desc;
+drop view if exists `simple_bill`;
 create view `simple_bill` as
 select `customer`.`id` as `id`,
   `customer`.`name` as `name`,

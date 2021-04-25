@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -22,6 +23,18 @@ class ExpressApplicationTests {
 		Connection connection = dataSource.getConnection();
 		System.out.println(connection);
 		connection.close();
+	}
+
+	@Test
+	void mytest() {
+		ArrayList<Integer> a = new ArrayList<>();
+		System.out.println(a);
+		a.add(0, 1);
+		System.out.println(a);
+		a.add(2);
+		System.out.println(a);
+		a.add(0, 3);
+		System.out.println(a);
 	}
 
 	@Autowired

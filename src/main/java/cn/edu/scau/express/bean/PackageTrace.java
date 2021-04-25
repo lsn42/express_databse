@@ -43,8 +43,8 @@ public class PackageTrace {
     };
 
     public boolean equals(Point p) {
-      return (this.longitude - p.longitude) < 1e-7
-          && (this.latitude - p.latitude) < 1e-7;
+      return Math.abs(this.longitude - p.longitude) < 1e-7
+          && Math.abs(this.latitude - p.latitude) < 1e-7;
     }
   }
 
@@ -65,7 +65,7 @@ public class PackageTrace {
     if (this.points.isEmpty()) {
       this.points.add(p);
     } else {
-      if (!this.points.get(0).equals(p)) {
+      if (!p.equals(this.points.get(0))) {
         this.points.add(0, p);
       }
     }
@@ -85,7 +85,7 @@ public class PackageTrace {
     if (this.points.isEmpty()) {
       this.points.add(p);
     } else {
-      if (!this.points.get(0).equals(p)) {
+      if (!p.equals(this.points.get(0))) {
         this.points.add(0, p);
       }
     }
@@ -101,7 +101,7 @@ public class PackageTrace {
     if (this.points.isEmpty()) {
       this.points.add(p);
     } else {
-      if (!this.points.get(0).equals(p)) {
+      if (!p.equals(this.points.get(0))) {
         this.points.add(0, p);
       }
     }
@@ -117,7 +117,7 @@ public class PackageTrace {
     if (this.points.isEmpty()) {
       this.points.add(p);
     } else {
-      if (!this.points.get(0).equals(p)) {
+      if (!p.equals(this.points.get(0))) {
         this.points.add(0, p);
       }
     }

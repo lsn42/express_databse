@@ -49,8 +49,8 @@ public class PackageTrackingMapper {
           logitude = rs.getBigDecimal("source_longitude").doubleValue();
           latitude = rs.getBigDecimal("source_latitude").doubleValue();
           if (type.equals("in")) {
-          } else if (type.equals("out")) {
             pt.insertEnd(time, logitude, latitude);
+          } else if (type.equals("out")) {
             pt.insertDispatch(time, method, logitude, latitude);
           }
         } else {
