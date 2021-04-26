@@ -1,6 +1,7 @@
 package cn.edu.scau.express;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 
-
+@Slf4j
 @SpringBootApplication
 @RestController
 //@MapperScan(value = "cn.edu.scau.express")
@@ -18,6 +19,7 @@ public class ExpressApplication {
 	public static HashMap<String, String> USERS = new HashMap<String,String>();
 
 	public static void main(String[] args) {
+		log.info("launch the application");
 		USERS.put("lsn", "lsn20001005");
 		USERS.put("admin", "admin");
 		SpringApplication.run(ExpressApplication.class, args);

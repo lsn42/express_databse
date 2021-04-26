@@ -1,5 +1,8 @@
 package cn.edu.scau.express.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cn.edu.scau.express.bean.UserLogin;
 import cn.edu.scau.express.service.UserLoginServicesImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,9 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
+@Slf4j
 public class UserLoginController {
+//    protected static final Logger logger = LoggerFactory.getLogger(UserLoginController.class);
     @Autowired
     UserLoginServicesImpl userLoginServicesImpl;
 
@@ -26,25 +31,27 @@ public class UserLoginController {
 
     @PostMapping("/LoginSuccess")
     public String LoginSuccess(Model model, UserLogin userLogin) {
+        log.info("into the login page");
         UserLogin userLogin1 = userLoginServicesImpl
                 .queryById(userLogin.getUser_id(), userLogin.getUser_psw());
         System.out.println(userLogin1);
         List<UserLogin> userLoginList = userLoginServicesImpl.queryAll();
-        for (UserLogin user : userLoginList) {
-            System.out.println(user);
-        }
+
         if (userLogin1 != null) {
-            // System.out.println(userLogin1.toString());
             String psw =
                     userLoginServicesImpl.queryPswById(userLogin1.getUser_id());
+
             System.out.println(userLogin1.getUser_psw());
             System.out.println(psw);
             if (userLogin1.getUser_permission().equals("admin")) {
+
                 return "admin";
             } else if (userLogin1.getUser_permission().equals("normal")) {
                 return "normal";
             }
+
         } else {
+
             model.addAttribute("data", "该用户不存在，或密码错误");
 
         }
