@@ -24,4 +24,13 @@ public class WorkerController {
     WorkerService ws = new WorkerService();
     return ws.delete(id);
   }
+
+  @PostMapping(value = "/create/worker")
+  public int create(@RequestParam("name") String name,
+      @RequestParam("sex") String sex, @RequestParam("tel") String tel,
+      @RequestParam("address") String address,
+      @RequestParam("salary") double salary) {
+    WorkerService ws = new WorkerService();
+    return ws.create(name, sex, tel, address, salary);
+  }
 }

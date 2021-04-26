@@ -15,6 +15,7 @@ public class TruckTrace {
   }
 
   public class Row {
+    public int eventId;
     public String time;
     public String source;
     public String destination;
@@ -36,10 +37,11 @@ public class TruckTrace {
     }
   }
 
-  public void insert(String time, String type, String source,
+  public void insert(int eventId, String time, String type, String source,
       String destination, double lnt, double lat) {
     Row r = new Row();
     Point p = new Point(lnt, lat);
+    r.eventId = eventId;
     r.time = time;
     r.source = source;
     r.destination = destination;

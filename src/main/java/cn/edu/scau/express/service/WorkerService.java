@@ -19,4 +19,10 @@ public class WorkerService {
     WorkerDAO wd = new WorkerDAO();
     return wd.delete(id);
   }
+
+  public int create(String name, String sex, String tel, String address,
+      double salary) {
+    WorkerDAO wd = new WorkerDAO();
+    return wd.create(name, sex, tel, address, salary);
+  }
 }

@@ -23,8 +23,10 @@ public class TruckTrackingDAO {
 
       tt.id = id;
       while (rs.next()) {
+        int eventId;
         String time, source, destination, transport_type;
         double logitude = 0, latitude = 0;
+        eventId = rs.getInt("event_id");
         tt.plate = rs.getString("plate");
         tt.type = rs.getString("type");
         // do not change the order of rs.getXX(), some of them are used for judgig null value
@@ -40,7 +42,7 @@ public class TruckTrackingDAO {
           logitude = rs.getBigDecimal("source_longitude").doubleValue();
           latitude = rs.getBigDecimal("source_latitude").doubleValue();
         }
-        tt.insert(time, transport_type, source, destination, logitude,
+        tt.insert(eventId, time, transport_type, source, destination, logitude,
             latitude);
       }
 
