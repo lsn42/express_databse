@@ -23,8 +23,8 @@ public class PlaceOrderController {
       @RequestParam("weight") String w, @RequestParam("timeliness") String ti) {
     String ss = "from: " + sa + " " + s + "\n" + "to: " + ea + " " + r + "\n"
         + "type: " + t + ", weight: " + w + ", timeliness: " + ti;
-    System.out.println("new order!");
-    System.out.println(ss);
+    String d40n = "----------------------------------------\n";
+    logger.info("new order!\n" + d40n + ss + d40n);
     PlaceOrderService pos = new PlaceOrderService();
     pos.insert(s, sa + " " + s, ea + " " + r, t, Double.parseDouble(w),
         Double.parseDouble(ti));

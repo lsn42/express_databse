@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup as bs
-from functools import cmp_to_key
 from tqdm import tqdm
 import json
 import math
@@ -186,123 +185,133 @@ def generate_customer(si, psi, pcsi, pccsi, c):
                     cursor.execute(sql)
                     rpcc += 1
 
+                mysql_conn.commit()
                 pbar.update(1)
-            mysql_conn.commit()
 
 
 def generate_truck(si, msi, c):
     with mysql_conn.cursor() as cursor:
-        for i in range(c):
+        with tqdm(total=c) as pbar:
+            for i in range(c):
 
-            w = random.choice(WORKERS)
-            tt = random.choice(TRUCK_TYPE)
-            plate = random.choice(CAR_PLATE_PROVINCE) + \
-                random.choice(CAR_PLATE_CITY)+"-" + \
-                random.choice(["", "D"]) + \
-                "".join(random.choices(CAR_PLATE_COMMON, k=5))
+                w = random.choice(WORKERS)
+                tt = random.choice(TRUCK_TYPE)
+                plate = random.choice(CAR_PLATE_PROVINCE) + \
+                    random.choice(CAR_PLATE_CITY)+"-" + \
+                    random.choice(["", "D"]) + \
+                    "".join(random.choices(CAR_PLATE_COMMON, k=5))
 
-            sql = TRANSPORT_METHOD_SQL.format(
-                method_id=msi+i,
-                name=tt + " " + plate)
-            cursor.execute(sql)
-            sql = TRUCK_SQL.format(
-                id=si+i,
-                method_id=msi+i,
-                worker_id=w[0],
-                truck_type=tt,
-                plate=plate,
-                vol=random.randrange(50, 10000))
-            cursor.execute(sql)
+                sql = TRANSPORT_METHOD_SQL.format(
+                    method_id=msi+i,
+                    name=tt + " " + plate)
+                cursor.execute(sql)
+                sql = TRUCK_SQL.format(
+                    id=si+i,
+                    method_id=msi+i,
+                    worker_id=w[0],
+                    truck_type=tt,
+                    plate=plate,
+                    vol=random.randrange(50, 10000))
+                cursor.execute(sql)
 
-            mysql_conn.commit()
+                mysql_conn.commit()
+                pbar.update(1)
 
 
 def generate_plane(si, msi, c):
     with mysql_conn.cursor() as cursor:
-        for i in range(c):
-            w = random.choice(WORKERS)
-            pt = random.choice(PLANE_TYPE)
-            flight = "".join(random.choices(FLIGHT_PERFIX, k=3)) +\
-                "".join(random.choices("0123456789", k=4))
+        with tqdm(total=c) as pbar:
+            for i in range(c):
+                w = random.choice(WORKERS)
+                pt = random.choice(PLANE_TYPE)
+                flight = "".join(random.choices(FLIGHT_PERFIX, k=3)) +\
+                    "".join(random.choices("0123456789", k=4))
 
-            sql = TRANSPORT_METHOD_SQL.format(
-                method_id=msi+i,
-                name=pt + " " + flight)
-            cursor.execute(sql)
-            sql = PLANE_SQL.format(
-                id=si+i,
-                method_id=msi+i,
-                worker_id=w[0],
-                plane_type=pt,
-                flight=flight,
-                vol=random.randrange(50, 10000))
-            cursor.execute(sql)
+                sql = TRANSPORT_METHOD_SQL.format(
+                    method_id=msi+i,
+                    name=pt + " " + flight)
+                cursor.execute(sql)
+                sql = PLANE_SQL.format(
+                    id=si+i,
+                    method_id=msi+i,
+                    worker_id=w[0],
+                    plane_type=pt,
+                    flight=flight,
+                    vol=random.randrange(50, 10000))
+                cursor.execute(sql)
 
-            mysql_conn.commit()
+                mysql_conn.commit()
+                pbar.update(1)
 
 
 def generate_porter(si, msi, c):
     with mysql_conn.cursor() as cursor:
-        for i in range(c):
+        with tqdm(total=c) as pbar:
+            for i in range(c):
 
-            w = random.choice(WORKERS)
+                w = random.choice(WORKERS)
 
-            sql = TRANSPORT_METHOD_SQL.format(
-                method_id=msi+i,
-                name="快递员："+w[1])
-            cursor.execute(sql)
-            sql = PORTER_SQL.format(
-                id=si+i,
-                method_id=msi+i,
-                worker_id=w[0])
-            cursor.execute(sql)
+                sql = TRANSPORT_METHOD_SQL.format(
+                    method_id=msi+i,
+                    name="快递员："+w[1])
+                cursor.execute(sql)
+                sql = PORTER_SQL.format(
+                    id=si+i,
+                    method_id=msi+i,
+                    worker_id=w[0])
+                cursor.execute(sql)
 
-            mysql_conn.commit()
+                mysql_conn.commit()
+                pbar.update(1)
 
 
 def generate_order(si, c, st=int(time.time())):
     names = get_people_names(c)
     with mysql_conn.cursor() as cursor:
-        for i in range(c):
+        with tqdm(total=c) as pbar:
+            for i in range(c):
 
-            cu = random.choice(CUSTOMERS)
-            s = get_china_location()
-            r = get_china_location()
-            now = st
-            fare = int(random.gauss(8, 4))
-            fare = 2 if fare < 2 else fare
+                cu = random.choice(CUSTOMERS)
+                s = get_china_location()
+                r = get_china_location()
+                now = st
+                fare = int(random.gauss(8, 4))
+                fare = 2 if fare < 2 else fare
 
-            sql = ORDER_SQL.format(
-                id=si+i,
-                customer_id=cu[0],
-                sender=s[0]+" "+cu[1],
-                recipient=r[0]+" "+names[i],
-                package_type=random.choice(PACKAGE_TYPE),
-                weight=random.randrange(10, 10000)/1000,
-                create_time=time.strftime(TIME_FORMAT, time.localtime(
-                    random.randrange(now-60*60*24, now))),
-                timeliness=time.strftime(TIME_FORMAT, time.localtime(
-                    random.randrange(now, now+5*60*60*24))),
-                fare=fare)
-            cursor.execute(sql)
-
-            if random.random() < RARE_RATE:
-                if random.random() < 0.5:
-                    sql = HAZARDOUS_MATERIAL_SQL.format(
-                        id=si+i, info=random.choice(HAZARDOUS_MATERIAL_TYPE))
-                else:
-                    sql = INTERNATIONAL_SHIPMENT_SQL.format(
-                        id=si+i,
-                        stating=random.choice(INTERNATIONAL_SHIPMENT_TYPE),
-                        value=random.randrange(1000, 100000)
-                    )
+                sql = ORDER_SQL.format(
+                    id=si+i,
+                    customer_id=cu[0],
+                    sender=s[0]+" "+cu[1],
+                    recipient=r[0]+" "+names[i],
+                    package_type=random.choice(PACKAGE_TYPE),
+                    weight=random.randrange(10, 10000)/1000,
+                    create_time=time.strftime(TIME_FORMAT, time.localtime(
+                        random.randrange(now-60*60*24, now))),
+                    timeliness=time.strftime(TIME_FORMAT, time.localtime(
+                        random.randrange(now, now+5*60*60*24))),
+                    fare=fare)
                 cursor.execute(sql)
 
-            mysql_conn.commit()
+                if random.random() < RARE_RATE:
+                    if random.random() < 0.5:
+                        sql = HAZARDOUS_MATERIAL_SQL.format(
+                            id=si+i, info=random.choice(HAZARDOUS_MATERIAL_TYPE))
+                    else:
+                        sql = INTERNATIONAL_SHIPMENT_SQL.format(
+                            id=si+i,
+                            stating=random.choice(INTERNATIONAL_SHIPMENT_TYPE),
+                            value=random.randrange(1000, 100000)
+                        )
+                    cursor.execute(sql)
+
+                mysql_conn.commit()
+                pbar.update(1)
 
 
 def transport(tesi):
     tec = 0
+    IN_PATH_METHODS = [i[0] for i in TRANSPORT_METHODS
+                       if not i[1].startswith("快递员")]
     with mysql_conn.cursor() as cursor:
 
         cursor.execute(ORDER_TRANSPORT_QUERY)
@@ -319,81 +328,60 @@ def transport(tesi):
             if i[0] in eo:
                 empty_order.append(i)
 
-        for o in empty_order:
-            sw = get_nearest_warehouse(
-                get_coordinate_of(o[2]))  # start warehouse id
-            sp = random.choice(rp)[1]  # start porter id
-            # destination warehouse id
-            dw = get_nearest_warehouse(get_coordinate_of(o[3]))
-            dp = random.choice(rp)[1]  # destination porter id
-            st = o[6]  # start time
-            et = o[7]  # end time
-            if et < st:  # invalid order
-                continue
+        with tqdm(total=len(empty_order)) as pbar:
+            for o in empty_order:
+                sw = get_nearest_warehouse(
+                    get_coordinate_of(o[2]))  # start warehouse id
+                sp = random.choice(rp)[1]  # start porter id
+                # destination warehouse id
+                dw = get_nearest_warehouse(get_coordinate_of(o[3]))
+                dp = random.choice(rp)[1]  # destination porter id
+                st = o[6]  # start time
+                et = o[7]  # end time
+                if et < st:  # invalid order
+                    continue
 
-            l = random.randrange(2, 7)  # middle transport step
-            p = networkx.dijkstra_path(
-                WAREHOUSES_GRAPH, source=sw, target=dw)  # dijkstra path
-            if len(p) < l:
+                p = networkx.dijkstra_path(
+                    WAREHOUSES_GRAPH, source=sw, target=dw)  # dijkstra path
+                pm = []
+                pt = []
+                pw = []
                 l = len(p)-2
-            print(p)
+                if l >= 0:
+                    if l > 7:
+                        l = random.randrange(2, 7)
+                elif l == -1:
+                    continue  # TODO:
+                else:
+                    continue
+                pm = random.sample(IN_PATH_METHODS, l)  # path methods
+                pt = sorted(random.sample(
+                    range(int(((et-st).total_seconds())/ON_TIME_RATE)), l*2+1+2))  # path times
+                pw = random.sample(p[1:-1], l)  # path warehouse
+                pw.append(p[0])
+                pw.append(p[-1])
 
-            pm = random.sample(
-                [i[0] for i in TRANSPORT_METHODS if not i[1].startswith("快递员")], l)  # path methods
-            pt = sorted(random.sample(
-                range(int(((et-st).seconds)/ON_TIME_RATE)), l*2+1+2))  # path times
-            pw = random.sample(p[1:-1], l)  # path warehouse
-            pw.append(p[0])
-            pw.append(p[-1])
-            def cmp(x, y): return p.index(x) < p.index(y)
-            for i in range(len(pw)):
-                for j in range(i):
-                    if cmp(pw[i], pw[j]):
-                        t = pw[i]
-                        pw[i] = pw[j]
-                        pw[j] = t
-            # print([(st+datetime.timedelta(seconds=i)).strftime(TIME_FORMAT)
-            #        for i in pt], pm, pw)
+                def cmp(x, y): return p.index(x) < p.index(y)
+                for i in range(len(pw)):
+                    for j in range(i):
+                        if cmp(pw[i], pw[j]):
+                            t = pw[i]
+                            pw[i] = pw[j]
+                            pw[j] = t
+                # print("planned way: ", str(pw),
+                #       "\ntimes: ", str(
+                #     [(st+datetime.timedelta(seconds=i)).strftime(TIME_FORMAT) for i in pt]),
+                #     "\npath methods: ", pm)
 
-            # company recieve package from customer
-            # warehouse 0 means customer
-            sql = TRANSPORT_EVENT_SQL.format(
-                id=tesi+tec,
-                method_id=sp,
-                time=st+datetime.timedelta(seconds=pt[0]),
-                transport_type="in",
-                source=0,
-                destination=sw)
-            cursor.execute(sql)
-            sql = TRANSPORT_SQL.format(
-                order_id=o[0],
-                event_id=tesi+tec)
-            tec += 1
-            cursor.execute(sql)
-
-            # transporting package
-            # for each middle transport
-            for i in range(l):
+                # company recieve package from customer
+                # warehouse 0 means customer
                 sql = TRANSPORT_EVENT_SQL.format(
                     id=tesi+tec,
-                    method_id=pm[i],
-                    time=st+datetime.timedelta(seconds=pt[2*i+1]),
-                    transport_type="out",
-                    source=pw[i],
-                    destination=pw[i+1])
-                cursor.execute(sql)
-                sql = TRANSPORT_SQL.format(
-                    order_id=o[0],
-                    event_id=tesi+tec)
-                tec += 1
-                cursor.execute(sql)
-                sql = TRANSPORT_EVENT_SQL.format(
-                    id=tesi+tec,
-                    method_id=pm[i],
-                    time=st+datetime.timedelta(seconds=pt[2*i+1+1]),
+                    method_id=sp,
+                    time=st+datetime.timedelta(seconds=pt[0]),
                     transport_type="in",
-                    source=pw[i],
-                    destination=pw[i+1])
+                    source=0,
+                    destination=sw)
                 cursor.execute(sql)
                 sql = TRANSPORT_SQL.format(
                     order_id=o[0],
@@ -401,36 +389,67 @@ def transport(tesi):
                 tec += 1
                 cursor.execute(sql)
 
-            # package arrived
-            # warehouse 0 means customer
-            sql = TRANSPORT_EVENT_SQL.format(
-                id=tesi+tec,
-                method_id=dp,
-                time=st+datetime.timedelta(seconds=pt[-2]),
-                transport_type="out",
-                source=dw,
-                destination=0)
-            cursor.execute(sql)
-            sql = TRANSPORT_SQL.format(
-                order_id=o[0],
-                event_id=tesi+tec)
-            tec += 1
-            cursor.execute(sql)
-            sql = TRANSPORT_EVENT_SQL.format(
-                id=tesi+tec,
-                method_id=dp,
-                time=st+datetime.timedelta(seconds=pt[-1]),
-                transport_type="in",
-                source=dw,
-                destination=0)
-            cursor.execute(sql)
-            sql = TRANSPORT_SQL.format(
-                order_id=o[0],
-                event_id=tesi+tec)
-            tec += 1
-            cursor.execute(sql)
+                # transporting package
+                # for each middle transport
+                for i in range(l):
+                    sql = TRANSPORT_EVENT_SQL.format(
+                        id=tesi+tec,
+                        method_id=pm[i],
+                        time=st+datetime.timedelta(seconds=pt[2*i+1]),
+                        transport_type="out",
+                        source=pw[i],
+                        destination=pw[i+1])
+                    cursor.execute(sql)
+                    sql = TRANSPORT_SQL.format(
+                        order_id=o[0],
+                        event_id=tesi+tec)
+                    tec += 1
+                    cursor.execute(sql)
+                    sql = TRANSPORT_EVENT_SQL.format(
+                        id=tesi+tec,
+                        method_id=pm[i],
+                        time=st+datetime.timedelta(seconds=pt[2*i+1+1]),
+                        transport_type="in",
+                        source=pw[i],
+                        destination=pw[i+1])
+                    cursor.execute(sql)
+                    sql = TRANSPORT_SQL.format(
+                        order_id=o[0],
+                        event_id=tesi+tec)
+                    tec += 1
+                    cursor.execute(sql)
 
-            mysql_conn.commit()
+                # package arrived
+                # warehouse 0 means customer
+                sql = TRANSPORT_EVENT_SQL.format(
+                    id=tesi+tec,
+                    method_id=dp,
+                    time=st+datetime.timedelta(seconds=pt[-2]),
+                    transport_type="out",
+                    source=dw,
+                    destination=0)
+                cursor.execute(sql)
+                sql = TRANSPORT_SQL.format(
+                    order_id=o[0],
+                    event_id=tesi+tec)
+                tec += 1
+                cursor.execute(sql)
+                sql = TRANSPORT_EVENT_SQL.format(
+                    id=tesi+tec,
+                    method_id=dp,
+                    time=st+datetime.timedelta(seconds=pt[-1]),
+                    transport_type="in",
+                    source=dw,
+                    destination=0)
+                cursor.execute(sql)
+                sql = TRANSPORT_SQL.format(
+                    order_id=o[0],
+                    event_id=tesi+tec)
+                tec += 1
+                cursor.execute(sql)
+
+                mysql_conn.commit()
+                pbar.update(1)
 
 
 def get_data():
@@ -585,13 +604,14 @@ if __name__ == "__main__":
             eval(c[1])
         elif c[0] == "init":
             # generate customers
-            generate_worker(last(WORKERS)+1, 100)
-            generate_warehouse(last(WAREHOUSES)+1, 1000)
-            generate_customer(last(CUSTOMERS)+1,
-                              last(PAY_METHODS)+1,
-                              last(PAY_METHOD_CONTRACT)+1,
-                              last(PAY_METHOD_CREDIT_CARD)+1,
-                              100)
+            # generate_worker(last(WORKERS)+1, 100)
+            # generate_warehouse(last(WAREHOUSES)+1, 1000)
+            # generate_customer(last(CUSTOMERS)+1,
+            #                   last(PAY_METHODS)+1,
+            #                   last(PAY_METHOD_CONTRACT)+1,
+            #                   last(PAY_METHOD_CREDIT_CARD)+1,
+            #                   100)
+            pass
         elif c[0] == "info":
             get_data()
             print(INIT_INFO.format(wc=len(WORKERS), whc=len(WAREHOUSES),
