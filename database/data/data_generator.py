@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup as bs
 from functools import cmp_to_key
+from tqdm import tqdm
 import json
 import math
 import networkx
@@ -27,8 +28,8 @@ FLIGHT_PERFIX = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 TRUCK_TYPE = ["面包车", "小货车", "大货车", "半挂车", ]
 PLANE_TYPE = ["大飞机", "小飞机", "直升飞机", ]
 PACKAGE_TYPE = ["普通包裹", "小盒子", "大盒子", "中盒子", "木箱", "冷冻物品", ]
-HAZARDOUS_MATERIAL = ["化学物品", "医疗废物", "放射性物质", ]
-INTERNATIONAL_SHIPMENT = ["电子设备", "药品", "书籍", ]
+HAZARDOUS_MATERIAL_TYPE = ["化学物品", "医疗废物", "放射性物质", ]
+INTERNATIONAL_SHIPMENT_TYPE = ["电子设备", "药品", "书籍", ]
 
 WAREHOUSE_SQL = "insert into `warehouse` values({id}, '{name}', '{address}', {lnt}, {lat}, {vol});"
 WORKER_SQL = "insert into `worker` values({id}, '{name}','{sex}','{tel}','{address}',{salary});"
@@ -45,12 +46,16 @@ PAY_WITH_CREDIT_CARD_SQL = "insert into `pay_with_credit_card` values({id}, {met
 CONTRACT_DESCRIPTION_1 = "每月可邮寄{count}件普通物品"
 
 ORDER_SQL = "insert into `order` values({id}, {customer_id}, '{sender}', '{recipient}', '{package_type}', {weight}, '{create_time}', '{timeliness}', {fare});"
+HAZARDOUS_MATERIAL_SQL = "insert into `hazardous_material` values({id}, '{info}');"
+INTERNATIONAL_SHIPMENT_SQL = "insert into `international_shipment` values({id}, '{stating}', {value});"
+
 TRANSPORT_EVENT_SQL = "insert into `transport_event` values({id}, {method_id}, '{time}', '{transport_type}', {source}, {destination});"
 TRANSPORT_SQL = "insert into `transport` values({order_id}, {event_id});"
 
 ORDER_TRANSPORT_QUERY = "select * from `order` join `transport` on `order`.id = `transport`.order_id join `transport_event` on `transport`.event_id = `transport_event`.id;"
 
 ON_TIME_RATE = 0.95
+RARE_RATE = 0.05
 
 mysql_conn = pymysql.connect(
     host="127.0.0.1", port=3306, user="root", password="20001005", db="express")
@@ -87,47 +92,115 @@ def get_people_names(c):
     return names
 
 
-def generate_warehouse(si, c):
-    with mysql_conn.cursor() as cursor:
-        for i in range(c):
-            r = get_china_location()
-            sql = WAREHOUSE_SQL.format(
-                id=si+i,
-                name=r[0]+"仓库",
-                address=r[0],
-                lnt=r[1],
-                lat=r[2],
-                vol=random.randrange(50, 100000))
-            cursor.execute(sql)
-            mysql_conn.commit()
-
-
 def generate_worker(si, c):
     names = get_people_names(c)
     with mysql_conn.cursor() as cursor:
-        for i in range(c):
-            addr = get_china_location()
-            salary = int(random.gauss(10000, 5000))
-            salary = 3000 if salary < 3000 else salary
-            sql = WORKER_SQL.format(
-                id=si+i, name=names[i],
-                sex="男"if random.randint(0, 1) == 0 else "女",
-                tel="1"+"".join(random.choices("0123456789", k=10)),
-                address=addr[0],
-                salary=salary)
-            cursor.execute(sql)
+        with tqdm(total=c) as pbar:
+            for i in range(c):
+
+                addr = get_china_location()
+                salary = int(random.gauss(10000, 5000))
+                salary = 3000 if salary < 3000 else salary
+
+                sql = WORKER_SQL.format(
+                    id=si+i, name=names[i],
+                    sex="男"if random.randint(0, 1) == 0 else "女",
+                    tel="1"+"".join(random.choices("0123456789", k=10)),
+                    address=addr[0],
+                    salary=salary)
+                cursor.execute(sql)
+
+                mysql_conn.commit()
+                pbar.update(1)
+
+
+def generate_warehouse(si, c):
+    with mysql_conn.cursor() as cursor:
+        with tqdm(total=c) as pbar:
+            for i in range(c):
+
+                r = get_china_location()
+
+                sql = WAREHOUSE_SQL.format(
+                    id=si+i,
+                    name=r[0]+"仓库",
+                    address=r[0],
+                    lnt=r[1],
+                    lat=r[2],
+                    vol=random.randrange(50, 100000))
+                cursor.execute(sql)
+
+                mysql_conn.commit()
+                pbar.update(1)
+
+
+def generate_customer(si, psi, pcsi, pccsi, c):
+    '''
+    start_index pay_method_start_index pay_with_contract_start_index
+    pay_with_credit_card_start_index count
+    '''
+    names = get_people_names(c)
+    rpc = 0  # recorded pay_with_contract
+    rpcc = 0  # recorded pay_with_credit_card
+    with mysql_conn.cursor() as cursor:
+        with tqdm(total=c) as pbar:
+            for i in range(c):
+
+                addr = get_china_location()
+
+                sql = CUSTOMER_SQL.format(
+                    id=si+i,
+                    name=names[i],
+                    sex="男"if random.randint(0, 1) == 0 else "女",
+                    tel="1"+"".join(random.choices("0123456789", k=10)),
+                    address=addr[0])
+                cursor.execute(sql)
+
+                pcc = int(random.gauss(0, 1))  # contract
+                for j in range(pcc):
+                    ci = random.randrange(100, 3000)
+
+                    sql = PAY_METHOD_SQL.format(
+                        id=psi+rpc+rpcc,
+                        customer_id=si+i)
+                    cursor.execute(sql)
+                    sql = PAY_WITH_CONTRACT_SQL.format(
+                        id=pcsi+rpc,
+                        method_id=psi+rpc+rpcc,
+                        number="".join(random.choices("0123456789", k=16)),
+                        bill=int(random.gauss(ci*4, ci)),
+                        description=CONTRACT_DESCRIPTION_1.format(count=ci))
+                    cursor.execute(sql)
+                    rpc += 1
+
+                pccc = int(random.gauss(2, 1))  # credit card
+                for j in range(pccc):
+                    sql = PAY_METHOD_SQL.format(
+                        id=psi+rpc+rpcc,
+                        customer_id=si+i)
+                    cursor.execute(sql)
+                    sql = PAY_WITH_CREDIT_CARD_SQL.format(
+                        id=pccsi+rpcc,
+                        method_id=psi+rpc+rpcc,
+                        number="".join(random.choices("0123456789", k=16)))
+                    cursor.execute(sql)
+                    rpcc += 1
+
+                pbar.update(1)
             mysql_conn.commit()
 
 
 def generate_truck(si, msi, c):
     with mysql_conn.cursor() as cursor:
         for i in range(c):
+
             w = random.choice(WORKERS)
             tt = random.choice(TRUCK_TYPE)
             plate = random.choice(CAR_PLATE_PROVINCE) + \
                 random.choice(CAR_PLATE_CITY)+"-" + \
                 random.choice(["", "D"]) + \
                 "".join(random.choices(CAR_PLATE_COMMON, k=5))
+
             sql = TRANSPORT_METHOD_SQL.format(
                 method_id=msi+i,
                 name=tt + " " + plate)
@@ -140,6 +213,7 @@ def generate_truck(si, msi, c):
                 plate=plate,
                 vol=random.randrange(50, 10000))
             cursor.execute(sql)
+
             mysql_conn.commit()
 
 
@@ -150,6 +224,7 @@ def generate_plane(si, msi, c):
             pt = random.choice(PLANE_TYPE)
             flight = "".join(random.choices(FLIGHT_PERFIX, k=3)) +\
                 "".join(random.choices("0123456789", k=4))
+
             sql = TRANSPORT_METHOD_SQL.format(
                 method_id=msi+i,
                 name=pt + " " + flight)
@@ -162,13 +237,16 @@ def generate_plane(si, msi, c):
                 flight=flight,
                 vol=random.randrange(50, 10000))
             cursor.execute(sql)
+
             mysql_conn.commit()
 
 
 def generate_porter(si, msi, c):
     with mysql_conn.cursor() as cursor:
         for i in range(c):
+
             w = random.choice(WORKERS)
+
             sql = TRANSPORT_METHOD_SQL.format(
                 method_id=msi+i,
                 name="快递员："+w[1])
@@ -178,56 +256,7 @@ def generate_porter(si, msi, c):
                 method_id=msi+i,
                 worker_id=w[0])
             cursor.execute(sql)
-            mysql_conn.commit()
 
-
-def generate_customer(si, psi, pcsi, pccsi, c):
-    '''
-    start_index pay_method_start_index pay_with_contract_start_index
-    pay_with_credit_card_start_index count
-    '''
-    names = get_people_names(c)
-    rpc = 0  # recorded pay_with_contract
-    rpcc = 0  # recorded pay_with_credit_card
-    with mysql_conn.cursor() as cursor:
-        for i in range(c):
-            addr = get_china_location()
-            sql = CUSTOMER_SQL.format(
-                id=si+i,
-                name=names[i],
-                sex="男"if random.randint(0, 1) == 0 else "女",
-                tel="1"+"".join(random.choices("0123456789", k=10)),
-                address=addr[0])
-            cursor.execute(sql)
-
-            pcc = int(random.gauss(0, 1))  # contract
-            for j in range(pcc):
-                ci = random.randrange(100, 3000)
-                sql = PAY_METHOD_SQL.format(
-                    id=psi+rpc+rpcc,
-                    customer_id=si+i)
-                cursor.execute(sql)
-                sql = PAY_WITH_CONTRACT_SQL.format(
-                    id=pcsi+rpc,
-                    method_id=psi+rpc+rpcc,
-                    number="".join(random.choices("0123456789", k=16)),
-                    bill=int(random.gauss(ci*4, ci)),
-                    description=CONTRACT_DESCRIPTION_1.format(count=ci))
-                cursor.execute(sql)
-                rpc += 1
-
-            pccc = int(random.gauss(2, 1))  # credit card
-            for j in range(pccc):
-                sql = PAY_METHOD_SQL.format(
-                    id=psi+rpc+rpcc,
-                    customer_id=si+i)
-                cursor.execute(sql)
-                sql = PAY_WITH_CREDIT_CARD_SQL.format(
-                    id=pccsi+rpcc,
-                    method_id=psi+rpc+rpcc,
-                    number="".join(random.choices("0123456789", k=16)))
-                cursor.execute(sql)
-                rpcc += 1
             mysql_conn.commit()
 
 
@@ -235,12 +264,14 @@ def generate_order(si, c, st=int(time.time())):
     names = get_people_names(c)
     with mysql_conn.cursor() as cursor:
         for i in range(c):
+
             cu = random.choice(CUSTOMERS)
             s = get_china_location()
             r = get_china_location()
             now = st
             fare = int(random.gauss(8, 4))
             fare = 2 if fare < 2 else fare
+
             sql = ORDER_SQL.format(
                 id=si+i,
                 customer_id=cu[0],
@@ -254,7 +285,20 @@ def generate_order(si, c, st=int(time.time())):
                     random.randrange(now, now+5*60*60*24))),
                 fare=fare)
             cursor.execute(sql)
-        mysql_conn.commit()
+
+            if random.random() < RARE_RATE:
+                if random.random() < 0.5:
+                    sql = HAZARDOUS_MATERIAL_SQL.format(
+                        id=si+i, info=random.choice(HAZARDOUS_MATERIAL_TYPE))
+                else:
+                    sql = INTERNATIONAL_SHIPMENT_SQL.format(
+                        id=si+i,
+                        stating=random.choice(INTERNATIONAL_SHIPMENT_TYPE),
+                        value=random.randrange(1000, 100000)
+                    )
+                cursor.execute(sql)
+
+            mysql_conn.commit()
 
 
 def transport(tesi):
@@ -266,12 +310,12 @@ def transport(tesi):
         cursor.execute("select * from `porter`;")
         rp = cursor.fetchall()
 
-        eo = [i[0] for i in ORDER]
+        eo = [i[0] for i in ORDERS]
         empty_order = []
         for i in rot:
             if i[0] in eo:
                 eo.remove(i[0])
-        for i in ORDER:
+        for i in ORDERS:
             if i[0] in eo:
                 empty_order.append(i)
 
@@ -288,12 +332,16 @@ def transport(tesi):
                 continue
 
             l = random.randrange(2, 7)  # middle transport step
+            p = networkx.dijkstra_path(
+                WAREHOUSES_GRAPH, source=sw, target=dw)  # dijkstra path
+            if len(p) < l:
+                l = len(p)-2
+            print(p)
+
             pm = random.sample(
                 [i[0] for i in TRANSPORT_METHODS if not i[1].startswith("快递员")], l)  # path methods
             pt = sorted(random.sample(
                 range(int(((et-st).seconds)/ON_TIME_RATE)), l*2+1+2))  # path times
-            p = networkx.dijkstra_path(
-                WAREHOUSES_GRAPH, source=sw, target=dw)  # dijkstra path
             pw = random.sample(p[1:-1], l)  # path warehouse
             pw.append(p[0])
             pw.append(p[-1])
@@ -386,16 +434,16 @@ def transport(tesi):
 
 
 def get_data():
-    global WORKERS, WAREHOUSES, TRANSPORT_METHODS, ORDER, TRANSPORT_EVENT, WAREHOUSES_GRAPH
+    global WORKERS, WAREHOUSES, TRANSPORT_METHODS, ORDERS, TRANSPORT_EVENT, WAREHOUSES_GRAPH
     global TRANSPORT_METHODS, PLANES, TRUCKS, PORTERS
     global CUSTOMERS, PAY_METHODS, PAY_METHOD_CREDIT_CARD, PAY_METHOD_CONTRACT
     with mysql_conn.cursor() as cursor:
 
-        sql = "select * from `worker`;"
+        sql = "select * from `worker` where id > 0;"
         cursor.execute(sql)
         WORKERS = cursor.fetchall()
 
-        sql = "select * from `warehouse` where id>0;"
+        sql = "select * from `warehouse` where id > 0;"
         cursor.execute(sql)
         WAREHOUSES = cursor.fetchall()
 
@@ -412,10 +460,10 @@ def get_data():
         cursor.execute(sql)
         PORTERS = cursor.fetchall()
 
-        sql = "select * from `customer`;"
+        sql = "select * from `customer` where id > 0;"
         cursor.execute(sql)
         CUSTOMERS = cursor.fetchall()
-        sql = "select * from `pay_method`;"
+        sql = "select * from `pay_method` where id > 0;"
         cursor.execute(sql)
         PAY_METHODS = cursor.fetchall()
         sql = "select * from `pay_with_credit_card`;"
@@ -427,7 +475,7 @@ def get_data():
 
         sql = "select * from `order`;"
         cursor.execute(sql)
-        ORDER = cursor.fetchall()
+        ORDERS = cursor.fetchall()
 
         sql = "select * from `transport_event`;"
         cursor.execute(sql)
@@ -455,6 +503,10 @@ def get_warehouse_graph():
                 wg.add_edge(
                     w1[0], w2[0], weight=distance(w1[1], w1[2], w2[1], w2[2]))
     WAREHOUSES_GRAPH = networkx.minimum_spanning_tree(wg)
+    # import matplotlib.pyplot as plt
+    # plt.figure(figsize=(8, 8))
+    # networkx.draw_networkx(WAREHOUSES_GRAPH)
+    # plt.show()
 
 
 def last(l):
@@ -503,43 +555,28 @@ PAY_METHODS = []
 PAY_METHOD_CREDIT_CARD = []
 PAY_METHOD_CONTRACT = []
 
-ORDER = []
+ORDERS = []
 TRANSPORT_EVENT = []
 
 WAREHOUSES_GRAPH = None
 
 INIT_INFO = 40*"-" + '''
-warehouse count: {whc}
 worker count: {wc}
+warehouse count: {whc}
+
+transport method count: {tmc}
+truck count: {tc}
+plane count: {plc}
+porter count: {poc}
+
 customer count: {cc}
 '''+40*"-"
 
 if __name__ == "__main__":
     get_data()
-    print(INIT_INFO.format(whc=len(WAREHOUSES),
-                           wc=len(WORKERS), cc=len(CUSTOMERS)))
-
-    # transport(last(TRANSPORT_EVENT)+1)
-
-    # import matplotlib.pyplot as plt
-    # plt.figure(figsize=(8, 8))
-    # networkx.draw_networkx(WAREHOUSES_GRAPH)
-    # plt.show()
-
-    # s = random.randint(1, len(whr))
-    # d = random.randint(1, len(whr))
-    # path = networkx.dijkstra_path(WG1, source=s, target=d)
-    # print(path)
-    # d = networkx.dijkstra_path_length(WG1, source=s, target=d)
-    # print(d)
-
-    # warehouse(last(WAREHOUSES)+1, 500)
-    # worker(last(WORKERS)+1, 900)
-    # get_data()
-    # truck(1, 1, 10)
-    # plane(11, 1, 10)
-    # porter(21, 1, 10)
-    # order(2, 10)
+    print(INIT_INFO.format(wc=len(WORKERS), whc=len(WAREHOUSES),
+                           tmc=len(TRANSPORT_METHODS), tc=len(TRUCKS), plc=len(PLANES), poc=len(PORTERS),
+                           cc=len(CUSTOMERS)))
 
     while True:
         print(">>> ", end="")
@@ -548,6 +585,8 @@ if __name__ == "__main__":
             eval(c[1])
         elif c[0] == "init":
             # generate customers
+            generate_worker(last(WORKERS)+1, 100)
+            generate_warehouse(last(WAREHOUSES)+1, 1000)
             generate_customer(last(CUSTOMERS)+1,
                               last(PAY_METHODS)+1,
                               last(PAY_METHOD_CONTRACT)+1,
@@ -555,8 +594,9 @@ if __name__ == "__main__":
                               100)
         elif c[0] == "info":
             get_data()
-            print(INIT_INFO.format(whc=len(WAREHOUSES),
-                                   wc=len(WORKERS), cc=len(CUSTOMERS)))
+            print(INIT_INFO.format(wc=len(WORKERS), whc=len(WAREHOUSES),
+                                   tmc=len(TRANSPORT_METHODS), tc=len(TRUCKS), plc=len(PLANES), poc=len(PORTERS),
+                                   cc=len(CUSTOMERS)))
         elif c[0] == "add":
             if c[1] == "customer":
                 generate_customer(last(CUSTOMERS)+1,
@@ -565,16 +605,26 @@ if __name__ == "__main__":
                                   last(PAY_METHOD_CREDIT_CARD)+1,
                                   int(c[2]))
             if c[1] == "worker":
-                generate_worker(last(WORKERS)+1,
-                                int(c[2]))
+                generate_worker(last(WORKERS)+1, int(c[2]))
             if c[1] == "warehouse":
-                generate_warehouse(last(WAREHOUSES)+1,
-                                   int(c[2]))
+                generate_warehouse(last(WAREHOUSES)+1, int(c[2]))
+            if c[1] == "order":
+                generate_order(last(ORDERS)+1, int(c[2]))
             if c[1] == "transport_method":
+                ttc = int(c[2])
+                pc = int(ttc*0.5)
+                tc = int(ttc*0.45)
+                plc = ttc-pc-tc
+                generate_porter(last(PORTERS)+1,
+                                last(TRANSPORT_METHODS)+1,
+                                pc)
                 generate_truck(last(TRUCKS)+1,
-                               last(TRANSPORT_METHODS)+1,
-                               80)
+                               last(TRANSPORT_METHODS)+1+pc,
+                               tc)
+                generate_plane(last(PLANES)+1,
+                               last(TRANSPORT_METHODS)+1+pc+tc,
+                               plc)
         elif c[0] == "transport":
-            transport(last(TRANSPORT_EVENT))
+            transport(last(TRANSPORT_EVENT)+1)
         elif c[0] == "exit" or c[0] == "q":
             break
