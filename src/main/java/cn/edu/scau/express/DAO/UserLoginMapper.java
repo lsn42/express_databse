@@ -18,4 +18,6 @@ public interface UserLoginMapper {
         public UserLogin queryById(String user_id, String user_psw);
 
         public String queryPswById(String user_id);
+
+
 }

@@ -34,7 +34,9 @@ public class UserLoginController {
             logger.info(String.format("user: %s(id:%s) login as %s",
                     userLogin1.getUser_name(), userLogin1.getUser_id(),
                     userLogin1.getUser_permission()));
+
             if (userLogin1.getUser_permission().equals("admin")) {
+
                 return "admin";
             } else if (userLogin1.getUser_permission().equals("normal")) {
                 return "normal";
@@ -43,7 +45,7 @@ public class UserLoginController {
         } else {
             logger.info(String.format("user: %s(id:%s) login failed",
                     userLogin.getUser_name(), userLogin.getUser_id()));
-            model.addAttribute("data", "该用户不存在，或密码错误");
+
         }
         return "login failed";
     }
@@ -58,18 +60,20 @@ public class UserLoginController {
             throws SQLIntegrityConstraintViolationException {
         try {
             userLoginServicesImpl.add(userLogin);
+            System.out.println(userLogin);
             logger.info(String.format(
                     "user: %s(id:%s) registered as %s, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
                     userLogin.getUser_permission(), userLogin.getUser_psw()));
-            model.addAttribute("data", "注册成功，请登录！");
+//            model.addAttribute("data", "注册成功，请登录！");
             return "true";
         } catch (Exception e) {
+            e.printStackTrace();
             logger.info(String.format(
                     "user: %s(id:%s) registered failed: duplicate id, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
                     userLogin.getUser_psw()));
-            model.addAttribute("data", "已有该用户存在");
+//            model.addAttribute("data", "已有该用户存在");
         }
         return "false";
     }

@@ -8,7 +8,11 @@
     </select>
 
     <insert id="add" parameterType="cn.edu.scau.express.bean.UserLogin">
-        insert into user_group values (#{user_id},#{user_name},#{user_psw},"normal")
+    <selectKey keyProperty="customer_id" resultType="int" order="BEFORE">
+    select customer_id+1 from customer order by customer_id asc limit 1;
+    </selectKey>
+        insert into user_group(user_id,user_name,user_psw,user_permission,customer_id,customer_sex,customer_tel,customer_address)
+        values (#{user_id},#{user_name},#{user_psw},'normal',#{customer_id},#{customer_sex},#{customer_tel},#{customer_address})
     </insert>
 
     <select id="queryByName" resultType="cn.edu.scau.express.bean.UserLogin">
