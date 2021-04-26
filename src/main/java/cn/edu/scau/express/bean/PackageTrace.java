@@ -19,6 +19,8 @@ public class PackageTrace {
   public static final String ARRIVED_INFO = "已签收，感谢使用东风，期待再次为您服务";
 
   public String id;
+  public String sender;
+  public String recipient;
   public ArrayList<Row> trace;
   public ArrayList<Point> points;
 

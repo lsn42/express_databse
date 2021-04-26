@@ -5,16 +5,28 @@ import cn.edu.scau.express.dao.OrderDAO;
 import cn.edu.scau.express.dao.customer.CustomerDAO;
 
 public class PlaceOrderService {
-  public void insert(String n, String s, String d, String t, double w,
-      double tm) {
+  public int createCommon(int customerId, String source, String destination,
+      String type, double weight, double timeliness) {
     OrderDAO o = new OrderDAO();
     CustomerDAO c = new CustomerDAO();
-    int id = c.getId(n);
+
     int fare = (new Random()).nextInt(32 - 4) + 4;
-    if (id == -1) {
-      c.insertCustomerOnlyName(n);
-      id = c.getId(n);
+    if (!c.isExist(customerId)) {
+      c.createCustomer(customerId);
     }
-    o.insertOrder(id, s, d, t, w, tm, fare);
+    return o.createOrder(customerId, source + c.getName(customerId),
+        destination, type, weight, timeliness, Double.valueOf(fare));
+  }
+
+  @Deprecated
+  public int createHazardous() {
+    // TODO: Is this necessary?
+    return 0;
+  }
+
+  @Deprecated
+  public int createInternational() {
+    // TODO: Is this necessary?
+    return 0;
   }
 }

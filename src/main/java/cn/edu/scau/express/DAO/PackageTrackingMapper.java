@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import cn.edu.scau.express.bean.Order;
 import cn.edu.scau.express.bean.PackageTrace;
 import cn.edu.scau.express.utils.JDBCUtil;
 
@@ -16,16 +17,20 @@ public class PackageTrackingMapper {
   public static final String SELECT_PACKAGE_TRACE_BY_ID =
       "select * from package_tracking where id=?;";
 
-  public PackageTrace queryById(String id) {
+  public PackageTrace selectById(int id) {
     PackageTrace pt = new PackageTrace();
+    OrderDAO o = new OrderDAO();
+    Order or = o.getOrder(id);
+    pt.id = String.valueOf(id);
+    pt.sender = or.sender;
+    pt.recipient = or.recipient;
     try (Connection connection = JDBCUtil.getConnection()) {
-      PreparedStatement preparedStatement = connection
+      PreparedStatement ps = connection
           .prepareStatement(PackageTrackingMapper.SELECT_PACKAGE_TRACE_BY_ID);
 
-      preparedStatement.setString(1, id);
-      ResultSet rs = preparedStatement.executeQuery();
+      ps.setInt(1, id);
+      ResultSet rs = ps.executeQuery();
 
-      pt.id = id;
       while (rs.next()) {
         String time, source, destination, method, type;
         double logitude = 0, latitude = 0;
@@ -65,9 +70,10 @@ public class PackageTrackingMapper {
               logitude, latitude);
         }
       }
-
-    } catch (SQLException ex) {
-      ex.printStackTrace();
+      ps.close();
+      rs.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
     return pt;
   }
