@@ -6,28 +6,35 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import cn.edu.scau.express.service.CustomerService;
 import cn.edu.scau.express.service.PlaceOrderService;
 
 @RestController
 @CrossOrigin
 public class PlaceOrderController {
+  public static final String INFO = "%s, 你的快递已登记完毕，运单号为 %d，请等待运输。";
   protected static final Logger logger =
       LoggerFactory.getLogger(PlaceOrderController.class);
 
   @PostMapping(value = "/submit/order")
-  public String placeOrder(@RequestParam("sender") String s,
-      @RequestParam("start_address") String sa,
-      @RequestParam("recipient") String r,
-      @RequestParam("end_address") String ea, @RequestParam("type") String t,
-      @RequestParam("weight") String w, @RequestParam("timeliness") String ti) {
-    String ss = "from: " + sa + " " + s + "\n" + "to: " + ea + " " + r + "\n"
-        + "type: " + t + ", weight: " + w + ", timeliness: " + ti;
-    System.out.println("new order!");
-    System.out.println(ss);
+  public String placeOrder(@RequestParam("sender") String senderId,
+      @RequestParam("start_address") String startAddress,
+      @RequestParam("recipient") String recipient,
+      @RequestParam("end_address") String endAddress,
+      @RequestParam("type") String type, @RequestParam("weight") String weight,
+      @RequestParam("timeliness") String timeliness) {
+    CustomerService c = new CustomerService();
+    String name = c.getName(Integer.parseInt(senderId));
+    String d40 = "----------------------------------------"; // dash*40
+    logger.info("new order!\n" + d40 + "\n" + "from: " + startAddress + " "
+        + name + "\n" + "to: " + endAddress + " " + recipient + "\n" + "type: "
+        + type + ", weight: " + weight + ", timeliness: " + timeliness + "\n"
+        + d40);
+
     PlaceOrderService pos = new PlaceOrderService();
-    pos.insert(s, sa + " " + s, ea + " " + r, t, Double.parseDouble(w),
-        Double.parseDouble(ti));
-    return ss;
+    return String.format(PlaceOrderController.INFO, name,
+        pos.createCommon(Integer.parseInt(senderId), startAddress,
+            endAddress + " " + recipient, type, Double.parseDouble(weight),
+            Double.parseDouble(timeliness)));
   }
 }
