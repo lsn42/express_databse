@@ -15,6 +15,7 @@ import cn.edu.scau.express.service.PackageTrackingService;
 @RestController
 @CrossOrigin
 public class PackageTrackingController {
+
   protected static final Logger logger =
       LoggerFactory.getLogger(PackageTrackingController.class);
 
@@ -22,7 +23,8 @@ public class PackageTrackingController {
   @GetMapping(value = "/query/trace/{id}")
   public String Trace(@PathVariable("id") String id,
       HttpServletRequest request) {
+
     logger.info("access " + id + " from: " + request.getRemoteAddr());
-    return (new Gson()).toJson(PackageTrackingService.selectById(id));
+    return (new Gson()).toJson(PackageTrackingService.getPackageTrace(id));
   }
 }

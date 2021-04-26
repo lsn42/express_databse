@@ -5,10 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import cn.edu.scau.express.bean.customer.bill.item.*;
 import cn.edu.scau.express.utils.JDBCUtil;
 
 public class BillDAO {
+
   public static final String SELECT_SIMPLE_BILL =
       "select * from `simple_bill`;";
   public static final String SELECT_EACH_BILL =
@@ -16,8 +18,10 @@ public class BillDAO {
   public static final String SELECT_TYPE_BILL =
       "select * from `type_of_service_bill`;";
 
-  public ArrayList<Simple> selectSimple() {
+  public ArrayList<Simple> getSimple() {
+
     ArrayList<Simple> result = new ArrayList<>();
+
     try (Connection connection = JDBCUtil.getConnection()) {
       PreparedStatement ps =
           connection.prepareStatement(BillDAO.SELECT_SIMPLE_BILL);
@@ -30,14 +34,19 @@ public class BillDAO {
         s.amount = rs.getString("amount");
         result.add(s);
       }
+      ps.close();
+      rs.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+
     return result;
   }
 
-  public ArrayList<Type> selectType() {
+  public ArrayList<Type> getType() {
+
     ArrayList<Type> result = new ArrayList<>();
+
     try (Connection connection = JDBCUtil.getConnection()) {
       PreparedStatement ps =
           connection.prepareStatement(BillDAO.SELECT_TYPE_BILL);
@@ -51,14 +60,19 @@ public class BillDAO {
         t.amount = rs.getString("amount");
         result.add(t);
       }
+      ps.close();
+      rs.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+
     return result;
   }
 
-  public ArrayList<Each> selectEach() {
+  public ArrayList<Each> getEach() {
+
     ArrayList<Each> result = new ArrayList<>();
+
     try (Connection connection = JDBCUtil.getConnection()) {
       PreparedStatement ps =
           connection.prepareStatement(BillDAO.SELECT_EACH_BILL);
@@ -77,9 +91,12 @@ public class BillDAO {
         e.fare = rs.getString("fare");
         result.add(e);
       }
+      ps.close();
+      rs.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+
     return result;
   }
 }

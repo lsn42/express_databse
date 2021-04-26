@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import cn.edu.scau.express.service.CustomerBillService;
 
 @RestController
@@ -14,21 +15,21 @@ public class CustomerBillController {
   @ResponseBody
   @GetMapping(value = "/query_all/bill/simple")
   public String simple() {
-    CustomerBillService cbs = new CustomerBillService();
-    return (new Gson()).toJson(cbs.selectSimple());
+    CustomerBillService c = new CustomerBillService();
+    return (new Gson()).toJson(c.selectSimple());
   }
 
   @ResponseBody
   @GetMapping(value = "/query_all/bill/type")
   public String type() {
-    CustomerBillService cbs = new CustomerBillService();
-    return (new Gson()).toJson(cbs.selectType());
+    CustomerBillService c = new CustomerBillService();
+    return (new Gson()).toJson(c.selectType());
   }
 
   @ResponseBody
   @GetMapping(value = "/query_all/bill/each")
   public String each() {
-    CustomerBillService cbs = new CustomerBillService();
-    return (new Gson()).toJson(cbs.selectEach());
+    CustomerBillService c = new CustomerBillService();
+    return (new Gson()).toJson(c.selectEach());
   }
 }

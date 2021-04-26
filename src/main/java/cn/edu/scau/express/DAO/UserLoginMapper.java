@@ -2,8 +2,9 @@ package cn.edu.scau.express.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
-import cn.edu.scau.express.bean.UserLogin;
 import java.util.List;
+
+import cn.edu.scau.express.bean.UserLogin;
 
 @Mapper
 @Repository
@@ -18,6 +19,5 @@ public interface UserLoginMapper {
         public UserLogin queryById(String user_id, String user_psw);
 
         public String queryPswById(String user_id);
-
 
 }

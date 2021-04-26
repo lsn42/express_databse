@@ -1,14 +1,15 @@
 package cn.edu.scau.express.service;
 
-import cn.edu.scau.express.bean.UserLogin;
-import cn.edu.scau.express.dao.UserLoginMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
+import cn.edu.scau.express.bean.UserLogin;
+import cn.edu.scau.express.dao.UserLoginMapper;
 
 @Service
 public class UserLoginServicesImpl implements UserLoginServicesI {
+
     @Autowired
     UserLoginMapper userLoginMapper;
 

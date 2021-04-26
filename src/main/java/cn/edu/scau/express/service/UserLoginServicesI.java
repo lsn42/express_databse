@@ -1,9 +1,11 @@
 package cn.edu.scau.express.service;
 
 import java.util.List;
+
 import cn.edu.scau.express.bean.UserLogin;
 
 public interface UserLoginServicesI {
+
     public List<UserLogin> queryAll();
 
     public int add(UserLogin userLogin);

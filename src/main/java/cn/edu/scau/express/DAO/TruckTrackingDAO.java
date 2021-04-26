@@ -5,21 +5,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+
 import cn.edu.scau.express.bean.TruckTrace;
 import cn.edu.scau.express.utils.JDBCUtil;
 
 public class TruckTrackingDAO {
+
   public static final String SELECT_BY_ID =
       "select * from `truck_tracking` where id=?;";
 
   public TruckTrace selectById(String id) {
     TruckTrace tt = new TruckTrace();
     try (Connection connection = JDBCUtil.getConnection()) {
-      PreparedStatement preparedStatement =
-          connection.prepareStatement(SELECT_BY_ID);
+      PreparedStatement ps =
+          connection.prepareStatement(TruckTrackingDAO.SELECT_BY_ID);
 
-      preparedStatement.setString(1, id);
-      ResultSet rs = preparedStatement.executeQuery();
+      ps.setString(1, id);
+      ResultSet rs = ps.executeQuery();
 
       tt.id = id;
       while (rs.next()) {
@@ -45,7 +47,8 @@ public class TruckTrackingDAO {
         tt.insert(eventId, time, transport_type, source, destination, logitude,
             latitude);
       }
-
+      ps.close();
+      rs.close();
     } catch (SQLException ex) {
       ex.printStackTrace();
     }

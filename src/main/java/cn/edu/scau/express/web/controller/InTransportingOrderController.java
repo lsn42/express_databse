@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import cn.edu.scau.express.service.OrderService;
 
 @RestController
 @CrossOrigin
 public class InTransportingOrderController {
+
   protected static final Logger logger =
       LoggerFactory.getLogger(InTransportingOrderController.class);
 
@@ -21,6 +23,7 @@ public class InTransportingOrderController {
   @GetMapping(value = "/query/transporting/{id}")
   public String Trace(@PathVariable("id") String id,
       HttpServletRequest request) {
+
     logger.info("access " + id + " from: " + request.getRemoteAddr());
     OrderService o = new OrderService();
     return (new Gson()).toJson(o.getOrderByTransportMethodId(id));

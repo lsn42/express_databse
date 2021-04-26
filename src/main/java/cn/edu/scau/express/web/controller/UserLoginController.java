@@ -2,19 +2,20 @@ package cn.edu.scau.express.web.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cn.edu.scau.express.bean.UserLogin;
-import cn.edu.scau.express.service.UserLoginServicesImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.sql.SQLIntegrityConstraintViolationException;
+
+import cn.edu.scau.express.bean.UserLogin;
+import cn.edu.scau.express.service.UserLoginServicesImpl;
 
 @RestController
 @CrossOrigin
 public class UserLoginController {
+
     protected static final Logger logger =
             LoggerFactory.getLogger(UserLoginController.class);
     @Autowired
@@ -65,7 +66,7 @@ public class UserLoginController {
                     "user: %s(id:%s) registered as %s, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
                     userLogin.getUser_permission(), userLogin.getUser_psw()));
-//            model.addAttribute("data", "注册成功，请登录！");
+            // model.addAttribute("data", "注册成功，请登录！");
             return "true";
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +74,7 @@ public class UserLoginController {
                     "user: %s(id:%s) registered failed: duplicate id, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
                     userLogin.getUser_psw()));
-//            model.addAttribute("data", "已有该用户存在");
+            // model.addAttribute("data", "已有该用户存在");
         }
         return "false";
     }
