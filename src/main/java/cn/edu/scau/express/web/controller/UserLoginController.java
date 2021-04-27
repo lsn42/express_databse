@@ -61,7 +61,6 @@ public class UserLoginController {
             throws SQLIntegrityConstraintViolationException {
         try {
             userLoginServicesImpl.add(userLogin);
-            System.out.println(userLogin);
             logger.info(String.format(
                     "user: %s(id:%s) registered as %s, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
@@ -71,7 +70,7 @@ public class UserLoginController {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info(String.format(
-                    "user: %s(id:%s) registered failed: duplicate id, password: %s",
+                    "user: %s(id:%s) registered failed, password: %s",
                     userLogin.getUser_name(), userLogin.getUser_id(),
                     userLogin.getUser_psw()));
             // model.addAttribute("data", "已有该用户存在");

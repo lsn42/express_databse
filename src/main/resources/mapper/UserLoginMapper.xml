@@ -9,7 +9,7 @@
 
     <insert id="add" parameterType="cn.edu.scau.express.bean.UserLogin">
     <selectKey keyProperty="customer_id" resultType="int" order="BEFORE">
-    select customer_id+1 from customer order by customer_id asc limit 1;
+    select id+1 from customer order by id desc limit 1;
     </selectKey>
         insert into user_group(user_id,user_name,user_psw,user_permission,customer_id,customer_sex,customer_tel,customer_address)
         values (#{user_id},#{user_name},#{user_psw},'normal',#{customer_id},#{customer_sex},#{customer_tel},#{customer_address})
